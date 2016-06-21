@@ -26,7 +26,7 @@ def EnumerateProperties(property_grid_1,node):
         else:
             raise Exception(u'Unhandled type enumeration. type: {}'.format(node.type_indicator))
     else:
-        raise Exception(u'Unhandled Class in Property Enumeration')
+        raise Exception(u'Unhandled Class in Property Enumeration. type: {}'.format(str(type(node))))
 
     for property in properties:
         property_grid_1.Append(property)
