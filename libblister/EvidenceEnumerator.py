@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import wx
 import os
+import re
 from dfvfs.credentials import manager as credentials_manager
+from dfvfs.path import factory as path_spec_factory
 from dfvfs.helpers import source_scanner
 from dfvfs.analyzer import analyzer
 from dfvfs.resolver import resolver
@@ -19,7 +21,23 @@ class EvidenceManager():
     def EnumerateEvidenceSource(self,filename):
         evidenceContainer = EvidenceContainer()
         evidenceContainer.OpenSourcePath(filename)
-        scan_path_spec = None
+
+        match = re.match(r"^\\\\\.\\([a-zA-Z])\:$",filename)
+
+        if match:
+            os_path_spec = path_spec_factory.Factory.NewPathSpec(
+                definitions.TYPE_INDICATOR_OS,
+                location=filename
+            )
+            logical_path_spec = path_spec_factory.Factory.NewPathSpec(
+                definitions.TYPE_INDICATOR_TSK,
+                location=u'/',
+                parent=os_path_spec
+            )
+
+            scan_path_spec = logical_path_spec
+        else:
+            scan_path_spec = None
 
         _source_scanner = source_scanner.SourceScanner()
         _source_scanner.Scan(
@@ -27,6 +45,11 @@ class EvidenceManager():
             auto_recurse=True,
             scan_path_spec=scan_path_spec
         )
+        if match:
+            evidenceContainer.AddScanNode(
+                logical_path_spec,
+                evidenceContainer.GetRootScanNode()
+            )
         _root_node = evidenceContainer.GetRootScanNode()
 
         root = self.mainFrame.tree_fs.GetRootItem()
@@ -98,7 +121,12 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
 
         if scan_node.type_indicator == definitions.TYPE_INDICATOR_OS:
             alias = getattr(scan_node.path_spec, 'location', None)
-            alias = os.path.basename(alias)
+
+            match = re.match(r"^\\\\\.\\([a-zA-Z])\:$",alias)
+            if match:
+                alias = alias[4:6]
+            else:
+                alias = os.path.basename(alias)
         elif scan_node.type_indicator == definitions.TYPE_INDICATOR_TSK_PARTITION:
             if scan_node.path_spec.part_index is not None:
                 alias = u'Partition Index - {}'.format(scan_node.path_spec.part_index)

@@ -7,6 +7,7 @@ import os
 import wx
 import wx.dataview
 import logging
+from LogicalVolumeDialog import LogicalVolumeDialog
 
 from libblister.EvidenceEnumerator import EvidenceManager
 from libblister import FileSystemEnumerator
@@ -29,8 +30,10 @@ class MainFrame(wx.Frame):
         # Menu Bar
         self.MainFrame_menubar = wx.MenuBar()
         self.File = wx.Menu()
-        self.Open = wx.MenuItem(self.File, wx.ID_ANY, _("Open"), "", wx.ITEM_NORMAL)
+        self.Open = wx.MenuItem(self.File, wx.ID_ANY, _("Open Image"), "", wx.ITEM_NORMAL)
         self.File.AppendItem(self.Open)
+        self.openLogical = wx.MenuItem(self.File, wx.ID_ANY, _("Open Logical"), "", wx.ITEM_NORMAL)
+        self.File.AppendItem(self.openLogical)
         self.File.AppendSeparator()
         self.Exit = wx.MenuItem(self.File, wx.ID_ANY, _("Exit"), "", wx.ITEM_NORMAL)
         self.File.AppendItem(self.Exit)
@@ -62,6 +65,7 @@ class MainFrame(wx.Frame):
         self.__do_layout()
 
         self.Bind(wx.EVT_MENU, self.OpenSource, self.Open)
+        self.Bind(wx.EVT_MENU, self.OpenLogical, self.openLogical)
         self.Bind(wx.EVT_MENU, self.ExitApplication, self.Exit)
         self.Bind(wx.EVT_TREE_ITEM_GETTOOLTIP, self.tree_fs_item_gettooltip, self.tree_fs)
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.tree_fs_sel_changed, self.tree_fs)
@@ -296,6 +300,22 @@ class MainFrame(wx.Frame):
             tree_item,
             node
         )
+    def OpenLogical(self, event):  # wxGlade: MainFrame.<event_handler>
+        print "Event handler 'OpenLogical' not implemented!"
+        volumeDialog = LogicalVolumeDialog(
+            self,
+            -1
+        )
+        volumeDialog.CenterOnScreen()
+        # this does not return until the dialog is closed.
+        res = volumeDialog.ShowModal()
+        if res == wx.ID_OK:
+            volume = volumeDialog.combo_logical_volumes.GetValue()
+            self.EnumerateSource(volume)
+
+        volumeDialog.Destroy()
+
+        event.Skip()
 # end of class MainFrame
 
 class MyFileDropTarget(wx.FileDropTarget):
