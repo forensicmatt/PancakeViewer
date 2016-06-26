@@ -42,13 +42,18 @@ def EnumerateNode(mainFrame,tree_item,node):
 
 def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_item=None):
     full_path = parent_full_path + u'/' + file_entry.name
-
+    file_entry.full_path = full_path
     if file_entry.IsDirectory():
         #print full_path.encode('utf-8', u'replace')
         if tree_item:
+            entry_name = file_entry.name
+
+            if file_entry.IsRoot():
+                entry_name = '[root]'
+
             folder_tree_item = tree_fs.AppendItem(
                 tree_item,
-                full_path.encode('utf-8', u'replace')
+                entry_name
             )
             item_data = wx.TreeItemData(
                 file_entry
@@ -59,7 +64,7 @@ def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_it
                 item_data
             )
             # Set Icons for this node
-            SetNodeIcons(file_entry, tree_fs, tree_item)
+            SetNodeIcons(file_entry, tree_fs, folder_tree_item)
         else:
             folder_tree_item = None
 
