@@ -4,8 +4,11 @@
 #
 
 import os
+import sys
 import wx
 import wx.dataview
+import  wx.lib.mixins.listctrl as listmix
+
 import logging
 from LogicalVolumeDialog import LogicalVolumeDialog
 
@@ -13,6 +16,10 @@ from libblister.EvidenceEnumerator import EvidenceManager
 from libblister import FileSystemEnumerator
 from libblister import Properties
 from wx.propgrid import PropertyGrid
+
+from dfvfs.vfs import tsk_file_entry
+
+#C:\Python27\Lib\site-packages\wx-3.0-msw\wx\dataview.py
 
 # begin wxGlade: dependencies
 import wx.propgrid
@@ -53,7 +60,7 @@ class MainFrame(wx.Frame):
         self.window_1_pane_2 = wx.Panel(self.window_1, wx.ID_ANY, style=wx.BORDER_SIMPLE | wx.TAB_TRAVERSAL)
         self.window_3 = wx.SplitterWindow(self.window_1_pane_2, wx.ID_ANY)
         self.window_3_pane_1 = wx.Panel(self.window_3, wx.ID_ANY)
-        self.list_records = wx.ListCtrl(self.window_3_pane_1, wx.ID_ANY, style=wx.LC_LIST)
+        self.list_records = RecordListCtrl(self.window_3_pane_1, wx.ID_ANY, style=wx.LC_REPORT | wx.LC_SORT_ASCENDING)
         self.window_3_pane_2 = wx.Panel(self.window_3, wx.ID_ANY)
         self.notebook_2 = wx.Notebook(self.window_3_pane_2, wx.ID_ANY, style=wx.NB_MULTILINE)
         self.notebook_2_pane_1 = wx.Panel(self.notebook_2, wx.ID_ANY)
@@ -84,6 +91,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.list_records_col_right_click, self.list_records)
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.list_records_item_right_click, self.list_records)
         # end wxGlade
+        self._InitRecordView()
         self.evidenceManager = EvidenceManager(
             self
         )
@@ -275,6 +283,10 @@ class MainFrame(wx.Frame):
         print "Event handler 'tree_fs_sel_changing' not implemented!"
         event.Skip()
 
+    def _InitRecordView(self):
+        self.list_records.InsertColumn(0,'Name')
+        self.list_records.InsertColumn(1, 'Size')
+
     def FsTreeItemSelected(self,event):
         print('FsTreeItemSelected')
         item = event.GetItem()
@@ -285,6 +297,9 @@ class MainFrame(wx.Frame):
 
         # Enumerate Folders
         self._EnumFolders(item,node)
+
+        # Populate Records Pane
+        self._PopulateRecords(item,node)
 
         print item
 
@@ -300,6 +315,17 @@ class MainFrame(wx.Frame):
             tree_item,
             node
         )
+
+    def _PopulateRecords(self,tree_item,file_entry):
+        self.list_records.DeleteAllItems()
+        if isinstance(file_entry,tsk_file_entry.TSKFileEntry):
+            for sub_file_entry in file_entry.sub_file_entries:
+                print sub_file_entry.name
+                self.list_records.InsertRecord(sub_file_entry)
+            pass
+
+        self.list_records.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+
     def OpenLogical(self, event):  # wxGlade: MainFrame.<event_handler>
         print "Event handler 'OpenLogical' not implemented!"
         volumeDialog = LogicalVolumeDialog(
@@ -317,6 +343,18 @@ class MainFrame(wx.Frame):
 
         event.Skip()
 # end of class MainFrame
+
+class RecordListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
+    def __init__(self, parent, ID, pos=wx.DefaultPosition,
+                 size=wx.DefaultSize, style=0):
+        wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
+        listmix.ListCtrlAutoWidthMixin.__init__(self)
+
+    def InsertRecord(self,node):
+        if isinstance(node, tsk_file_entry.TSKFileEntry):
+            index = self.InsertStringItem(sys.maxint, node.name)
+            #self.SetStringItem(index, 1, node.size)
+            #self.SetItemData(index, node)
 
 class MyFileDropTarget(wx.FileDropTarget):
     def __init__(self, window):
