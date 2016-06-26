@@ -5,7 +5,9 @@ from dfvfs.lib import definitions
 from dfvfs.volume import volume_system
 from dfvfs.volume import vshadow_volume_system
 from dfvfs.resolver import resolver
+
 from dfvfs.vfs import ntfs_file_system
+from dfvfs.vfs import tsk_file_entry
 
 def EnumerateProperties(property_grid_1,node):
     # Clear previous properties
@@ -25,6 +27,9 @@ def EnumerateProperties(property_grid_1,node):
             properties = VshadowProperties(node)
         else:
             raise Exception(u'Unhandled type enumeration. type: {}'.format(node.type_indicator))
+    elif isinstance(node,tsk_file_entry.TSKFileEntry):
+            properties = TskFileEntryProperties(node)
+            pass
     else:
         raise Exception(u'Unhandled Class in Property Enumeration. type: {}'.format(str(type(node))))
 
@@ -35,6 +40,13 @@ class OsProperties(list):
     def __init__(self,node):
         self.append(wx.propgrid.PropertyCategory("OS Path Spec"))
         self.append(wx.propgrid.StringProperty("Location", value=getattr(node.path_spec,'location',None)))
+        pass
+
+class TskFileEntryProperties(list):
+    def __init__(self,node):
+        self.append(wx.propgrid.StringProperty("Full Path",
+            value=u'{}'.format(node.full_path.encode('utf-8', u'replace'))))
+        self.append(wx.propgrid.PropertyCategory("TSK File Info"))
         pass
 
 class EwfProperties(list):
