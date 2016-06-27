@@ -46,8 +46,27 @@ class TskFileEntryProperties(list):
     def __init__(self,node):
         self.append(wx.propgrid.StringProperty("Full Path",
             value=u'{}'.format(node.full_path.encode('utf-8', u'replace'))))
-        self.append(wx.propgrid.PropertyCategory("TSK File Info"))
-        pass
+        self.append(wx.propgrid.PropertyCategory("TSK File Meta Info"))
+        meta = node._tsk_file.info.meta
+
+        self.append(wx.propgrid.StringProperty(
+            "Type", value=u'{}'.format(meta.type)))
+        self.append(wx.propgrid.StringProperty(
+            "Flags", value=u'{}'.format(meta.flags)))
+        self.append(wx.propgrid.UIntProperty(
+            "Address",value=meta.addr))
+        self.append(wx.propgrid.IntProperty(
+            "Sequence", value=meta.seq))
+        self.append(wx.propgrid.UIntProperty(
+            "Creation Time", value=meta.crtime))
+        self.append(wx.propgrid.UIntProperty(
+            "MFT Change Time", value=meta.ctime))
+        self.append(wx.propgrid.UIntProperty(
+            "Modified Time", value=meta.mtime))
+        self.append(wx.propgrid.UIntProperty(
+            "Access Time", value=meta.atime))
+        self.append(wx.propgrid.UIntProperty(
+            "Size", value=meta.size))
 
 class EwfProperties(list):
     def __init__(self,node):
