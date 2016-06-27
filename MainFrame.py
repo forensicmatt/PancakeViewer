@@ -192,6 +192,7 @@ class MainFrame(wx.Frame):
 
     def list_records_item_selected(self, event):  # wxGlade: MainFrame.<event_handler>
         print "Event handler 'list_records_item_selected' not implemented!"
+        self.RecordItemSelected(event)
         event.Skip()
 
     def list_records_item_focused(self, event):  # wxGlade: MainFrame.<event_handler>
@@ -287,6 +288,15 @@ class MainFrame(wx.Frame):
         self.list_records.InsertColumn(0,'Name')
         self.list_records.InsertColumn(1, 'Size')
 
+    def RecordItemSelected(self,event):
+        print('RecordItemSelected')
+        # Get item data here... need to check docs to see how to set
+        # item data for ListCtrl
+        node = self.list_records.GetItemData(event.m_itemIndex)
+
+        # Set Properties
+        self._SetProperties(node)
+
     def FsTreeItemSelected(self,event):
         print('FsTreeItemSelected')
         item = event.GetItem()
@@ -353,8 +363,10 @@ class RecordListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
     def InsertRecord(self,node):
         if isinstance(node, tsk_file_entry.TSKFileEntry):
             index = self.InsertStringItem(sys.maxint, node.name)
+            # Set item data here... need to check docs to see how to set
+            # item data for ListCtrl
             #self.SetStringItem(index, 1, node.size)
-            #self.SetItemData(index, node)
+            self.SetItemData(index, node)
 
 class MyFileDropTarget(wx.FileDropTarget):
     def __init__(self, window):
