@@ -6,15 +6,16 @@
 import os
 import sys
 import wx
-import wx.dataview
-import  wx.lib.mixins.listctrl as listmix
+import wx.dataview as dataview
+import wx.lib.mixins.listctrl as listmix
+from wx.lib.agw import ultimatelistctrl
 
 import logging
 from LogicalVolumeDialog import LogicalVolumeDialog
 
-from libblister.EvidenceEnumerator import EvidenceManager
-from libblister import FileSystemEnumerator
-from libblister import Properties
+from libpv.EvidenceEnumerator import EvidenceManager
+from libpv import FileSystemEnumerator
+from libpv import Properties
 from wx.propgrid import PropertyGrid
 
 from dfvfs.vfs import tsk_file_entry
@@ -60,7 +61,7 @@ class MainFrame(wx.Frame):
         self.window_1_pane_2 = wx.Panel(self.window_1, wx.ID_ANY, style=wx.BORDER_SIMPLE | wx.TAB_TRAVERSAL)
         self.window_3 = wx.SplitterWindow(self.window_1_pane_2, wx.ID_ANY)
         self.window_3_pane_1 = wx.Panel(self.window_3, wx.ID_ANY)
-        self.list_records = RecordListCtrl(self.window_3_pane_1, wx.ID_ANY, style=wx.LC_REPORT | wx.LC_SORT_ASCENDING)
+        self.list_records = RecordDVListCtrl(self.window_3_pane_1, wx.ID_ANY,style=wx.BORDER_THEME | dataview.DV_ROW_LINES | dataview.DV_VERT_RULES | dataview.DV_MULTIPLE)
         self.window_3_pane_2 = wx.Panel(self.window_3, wx.ID_ANY)
         self.notebook_2 = wx.Notebook(self.window_3_pane_2, wx.ID_ANY, style=wx.NB_MULTILINE)
         self.notebook_2_pane_1 = wx.Panel(self.notebook_2, wx.ID_ANY)
@@ -82,15 +83,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_TREE_ITEM_COLLAPSED, self.tree_fs_item_collapsed, self.tree_fs)
         self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.tree_fs_item_expanded, self.tree_fs)
         self.Bind(wx.EVT_TREE_SEL_CHANGING, self.tree_fs_sel_changing, self.tree_fs)
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.list_records_item_selected, self.list_records)
-        self.Bind(wx.EVT_LIST_ITEM_FOCUSED, self.list_records_item_focused, self.list_records)
-        self.Bind(wx.EVT_LIST_INSERT_ITEM, self.list_records_insert_item, self.list_records)
-        self.Bind(wx.EVT_LIST_COL_CLICK, self.list_records_col_click, self.list_records)
-        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, self.list_records_item_activated, self.list_records)
-        self.Bind(wx.EVT_LIST_ITEM_DESELECTED, self.list_records_item_deselected, self.list_records)
-        self.Bind(wx.EVT_LIST_COL_RIGHT_CLICK, self.list_records_col_right_click, self.list_records)
-        self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, self.list_records_item_right_click, self.list_records)
         # end wxGlade
+
         self._InitRecordView()
         self.evidenceManager = EvidenceManager(
             self
@@ -285,8 +279,16 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def _InitRecordView(self):
-        self.list_records.InsertColumn(0,'Name')
-        self.list_records.InsertColumn(1, 'Size')
+        #http://docs.wxwidgets.org/3.0/classwx_data_view_ctrl.html
+        self.list_records.AppendTextColumn("Name", 0, width=170)
+        self.list_records.AppendTextColumn("Size", 1, width=170)
+        # renderer = MyCustomRenderer(varianttype="long",mode=dataview.DATAVIEW_CELL_EDITABLE)
+        # size_column = dataview.DataViewColumn("Size", renderer, 1, width=170)
+        # self.list_records.AppendColumn(size_column)
+
+        for c in self.list_records.Columns:
+            c.Sortable = True
+            c.Reorderable = True
 
     def RecordItemSelected(self,event):
         print('RecordItemSelected')
@@ -334,8 +336,6 @@ class MainFrame(wx.Frame):
                 self.list_records.InsertRecord(sub_file_entry)
             pass
 
-        self.list_records.SetColumnWidth(0, wx.LIST_AUTOSIZE)
-
     def OpenLogical(self, event):  # wxGlade: MainFrame.<event_handler>
         print "Event handler 'OpenLogical' not implemented!"
         volumeDialog = LogicalVolumeDialog(
@@ -354,19 +354,108 @@ class MainFrame(wx.Frame):
         event.Skip()
 # end of class MainFrame
 
-class RecordListCtrl(wx.ListCtrl, listmix.ListCtrlAutoWidthMixin):
+class RecordDVListCtrl(dataview.DataViewListCtrl):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
                  size=wx.DefaultSize, style=0):
-        wx.ListCtrl.__init__(self, parent, ID, pos, size, style)
-        listmix.ListCtrlAutoWidthMixin.__init__(self)
+        dataview.DataViewListCtrl.__init__(self, parent, ID, pos, size, style)
 
     def InsertRecord(self,node):
         if isinstance(node, tsk_file_entry.TSKFileEntry):
-            index = self.InsertStringItem(sys.maxint, node.name)
-            # Set item data here... need to check docs to see how to set
-            # item data for ListCtrl
-            #self.SetStringItem(index, 1, node.size)
-            self.SetItemData(index, node)
+            meta = node._tsk_file.info.meta
+            item = self.AppendItem([node.name, str(meta.size)])
+
+            for dstream in node.data_streams:
+                if len(dstream.name) > 0:
+                    cname = u'{}:{}'.format(node.name,dstream.name)
+                    attr = dstream._tsk_attribute.info
+                    meta = node._tsk_file.info.meta
+                    item = self.AppendItem([cname, str(attr.size)])
+
+class UIntRenderer(dataview.DataViewCustomRenderer):
+    def __init__(self, *args, **kw):
+        dataview.PyDataViewCustomRenderer.__init__(self, *args, **kw)
+
+class MyCustomRenderer(dataview.PyDataViewCustomRenderer):
+    def __init__(self, *args, **kw):
+        dataview.PyDataViewCustomRenderer.__init__(self, *args, **kw)
+        pass
+
+    def SetValue(self, value):
+        self.value = value
+        return True
+
+    def GetValue(self):
+        # self.log.write('GetValue')
+        return self.value
+
+    def GetSize(self):
+        # Return the size needed to display the value.  The renderer
+        # has a helper function we can use for measuring text that is
+        # aware of any custom attributes that may have been set for
+        # this item.
+        return self.GetTextExtent(self.value)
+
+    def Render(self, rect, dc, state):
+        if state != 0:
+            self.log.write('Render: %s, %d' % (rect, state))
+
+        if not state & dataview.DATAVIEW_CELL_SELECTED:
+            # we'll draw a shaded background to see if the rect correctly
+            # fills the cell
+            dc.SetBrush(wx.Brush('light grey'))
+            dc.SetPen(wx.TRANSPARENT_PEN)
+            rect.Deflate(1, 1)
+            dc.DrawRoundedRectangleRect(rect, 2)
+
+        # And then finish up with this helper function that draws the
+        # text for us, dealing with alignment, font and color
+        # attributes, etc
+        self.RenderText(self.value,
+                        4,  # x-offset, to compensate for the rounded rectangles
+                        rect,
+                        dc,
+                        state  # wxDataViewCellRenderState flags
+                        )
+
+    # The HasEditorCtrl, CreateEditorCtrl and GetValueFromEditorCtrl
+    # methods need to be implemented if this renderer is going to
+    # support in-place editing of the cell value, otherwise they can
+    # be omitted.
+
+    def HasEditorCtrl(self):
+        self.log.write('HasEditorCtrl')
+        return True
+
+    def CreateEditorCtrl(self, parent, labelRect, value):
+        self.log.write('CreateEditorCtrl: %s' % labelRect)
+        ctrl = wx.TextCtrl(parent,
+                           value=value,
+                           pos=labelRect.Position,
+                           size=labelRect.Size)
+
+        # select the text and put the caret at the end
+        ctrl.SetInsertionPointEnd()
+        ctrl.SelectAll()
+
+        return ctrl
+
+    def GetValueFromEditorCtrl(self, editor):
+        self.log.write('GetValueFromEditorCtrl: %s' % editor)
+        value = editor.GetValue()
+        return value
+
+    # The LeftClick and Activate methods serve as notifications
+    # letting you know that the user has either clicked or
+    # double-clicked on an item.  Implementing them in your renderer
+    # is optional.
+
+    def LeftClick(self, pos, cellRect, model, item, col):
+        self.log.write('LeftClick')
+        return False
+
+    def Activate(self, cellRect, model, item, col):
+        self.log.write('Activate')
+        return False
 
 class MyFileDropTarget(wx.FileDropTarget):
     def __init__(self, window):
