@@ -10,35 +10,35 @@ def EnumerateNode(mainFrame,tree_item,node):
     if isinstance(node, source_scanner.SourceScanNode):
         if (node.type_indicator == definitions.TYPE_INDICATOR_TSK or
             node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW):
-            if node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW:
-                location = getattr(node.path_spec, 'location', None)
-                if location == u'/':
-                    return
-                identifier = location[1:]
-            try:
-                path_spec = node.path_spec
+            if mainFrame.tree_fs.GetChildrenCount(tree_item) < 1:
                 if node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW:
-                    path_spec = path_spec_factory.Factory.NewPathSpec(
-                        definitions.TYPE_INDICATOR_TSK, location=u'/',
-                        parent=node.path_spec)
-                file_system = resolver.Resolver.OpenFileSystem(path_spec)
-            except Exception as error:
-                file_system = None
-                print str(error)
+                    location = getattr(node.path_spec, 'location', None)
+                    if location == u'/':
+                        return
+                    identifier = location[1:]
+                try:
+                    path_spec = node.path_spec
+                    if node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW:
+                        path_spec = path_spec_factory.Factory.NewPathSpec(
+                            definitions.TYPE_INDICATOR_TSK, location=u'/',
+                            parent=node.path_spec)
+                    file_system = resolver.Resolver.OpenFileSystem(path_spec)
+                except Exception as error:
+                    file_system = None
+                    print str(error)
 
-            if file_system is not None:
-                #file_entry = resolver.Resolver.OpenFileEntry(node.path_spec)
-                file_entry = file_system.GetRootFileEntry()
+                if file_system is not None:
+                    #file_entry = resolver.Resolver.OpenFileEntry(node.path_spec)
+                    file_entry = file_system.GetRootFileEntry()
 
-                ProcessFolder(
-                    file_system,
-                    file_entry,
-                    u'',
-                    tree_fs=mainFrame.tree_fs,
-                    tree_item=tree_item
+                    ProcessFolder(
+                        file_system,
+                        file_entry,
+                        u'',
+                        tree_fs=mainFrame.tree_fs,
+                        tree_item=tree_item
                 )
     pass
-
 
 def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_item=None):
     full_path = parent_full_path + u'/' + file_entry.name
