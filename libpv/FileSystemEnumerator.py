@@ -114,6 +114,7 @@ def GetIcons(tree_fs, file_entry):
     if file_entry.type_indicator == definitions.TYPE_INDICATOR_TSK:
         icon_list.append([tree_fs.icon_fldridx, wx.TreeItemIcon_Normal])
         icon_list.append([tree_fs.icon_fldropenidx, wx.TreeItemIcon_Expanded])
+        icon_list.append([tree_fs.icon_fldropenidx, wx.TreeItemIcon_Selected])
     else:
         icon_list.append([tree_fs.icon_fldridx, wx.TreeItemIcon_Normal])
         icon_list.append([tree_fs.icon_fldropenidx, wx.TreeItemIcon_Expanded])
