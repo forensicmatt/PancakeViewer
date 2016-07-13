@@ -5,6 +5,7 @@
 
 import os
 import sys
+import copy
 import wx
 import wx.dataview as dataview
 import wx.lib.mixins.listctrl as listmix
@@ -271,11 +272,17 @@ class MainFrame(wx.Frame):
             c.Sortable = True
             c.Reorderable = True
 
+        self.Bind(dataview.EVT_DATAVIEW_SELECTION_CHANGED, self.list_records_item_changed, self.list_records)
+        self.Bind(dataview.EVT_DATAVIEW_ITEM_ACTIVATED, self.list_records_item_activated, self.list_records)
+        self.Bind(dataview.EVT_DATAVIEW_ITEM_CONTEXT_MENU, self.list_records_item_right_click, self.list_records)
+
     def RecordItemSelected(self,event):
-        print('RecordItemSelected')
-        # Get item data here... need to check docs to see how to set
-        # item data for ListCtrl
-        node = self.list_records.GetItemData(event.m_itemIndex)
+        item = event.GetItem()
+        value = event.GetValue()
+        pos = event.GetPosition()
+
+        pnt = self.list_records.GetItemData(item) - 1 # On a zero index
+        node = self.list_records.data[pnt]
 
         # Set Properties
         self._SetProperties(node)
@@ -311,11 +318,19 @@ class MainFrame(wx.Frame):
 
     def _PopulateRecords(self,tree_item,file_entry):
         self.list_records.DeleteAllItems()
+        self.list_records.ClearData()
+        self.list_records.SetCurrentParrent(file_entry)
         if isinstance(file_entry,tsk_file_entry.TSKFileEntry):
+            # After a while the file system will close... not sure if this is something I am doing.
+            # We need to check if the file system is closed, and open it before we try enumerating the entries
+            if not file_entry._file_system._is_open:
+                # Not sure if using the TSKFileEntry.path_spec is the best option here... but it works
+                file_entry._file_system.Open(file_entry.path_spec)
+
             for sub_file_entry in file_entry.sub_file_entries:
+                self.entry_cnt += 1
                 print sub_file_entry.name
-                self.list_records.InsertRecord(sub_file_entry)
-            pass
+                self.list_records.InsertRecord(sub_file_entry,file_entry.full_path)
 
     def OpenLogical(self, event):  # wxGlade: MainFrame.<event_handler>
         print "Event handler 'OpenLogical' not implemented!"
@@ -338,19 +353,40 @@ class MainFrame(wx.Frame):
 class RecordDVListCtrl(dataview.DataViewListCtrl):
     def __init__(self, parent, ID, pos=wx.DefaultPosition,
                  size=wx.DefaultSize, style=0):
+        self.data = []
+        self.current_parrent = None
         dataview.DataViewListCtrl.__init__(self, parent, ID, pos, size, style)
 
-    def InsertRecord(self,node):
+    def SetCurrentParrent(self,node):
+        self.current_parrent = node
+
+    def ClearData(self):
+        self.data = []
+
+    def InsertRecord(self,node,path):
         if isinstance(node, tsk_file_entry.TSKFileEntry):
             meta = node._tsk_file.info.meta
-            item = self.AppendItem([node.name, str(meta.size)])
+
+            # Set data node #
+            new_node = copy.copy(node)
+            new_node.full_path = "{}/{}".format(path, node.name)
+            self.data.append(new_node)
+            # data int is key to the node #
+            item = self.AppendItem([node.name, str(meta.size)],data=len(self.data))
 
             for dstream in node.data_streams:
                 if len(dstream.name) > 0:
                     cname = u'{}:{}'.format(node.name,dstream.name)
                     attr = dstream._tsk_attribute.info
                     meta = node._tsk_file.info.meta
-                    item = self.AppendItem([cname, str(attr.size)])
+
+                    # Set data node #
+                    new_node = copy.copy(node)
+                    new_node.full_path = "{}/{}".format(path,cname)
+                    self.data.append(new_node)
+                    # data int is key to the node #
+                    item = self.AppendItem([cname, str(attr.size)],data=len(self.data))
+                    pass
 
 class UIntRenderer(dataview.DataViewCustomRenderer):
     def __init__(self, *args, **kw):
