@@ -184,33 +184,14 @@ class MainFrame(wx.Frame):
         print "Event handler 'tree_fs_item_changing'"
         event.Skip()
 
-    def list_records_item_selected(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_item_selected' not implemented!"
+    def list_records_item_changed(self, event):  # wxGlade: MainFrame.<event_handler>
+        print "Event handler 'list_records_item_changed' not implemented!"
         self.RecordItemSelected(event)
-        event.Skip()
-
-    def list_records_item_focused(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_item_focused' not implemented!"
-        event.Skip()
-
-    def list_records_insert_item(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_insert_item' not implemented!"
-        event.Skip()
-
-    def list_records_col_click(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_col_click' not implemented!"
         event.Skip()
 
     def list_records_item_activated(self, event):  # wxGlade: MainFrame.<event_handler>
         print "Event handler 'list_records_item_activated' not implemented!"
-        event.Skip()
-
-    def list_records_item_deselected(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_item_deselected' not implemented!"
-        event.Skip()
-
-    def list_records_col_right_click(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_col_right_click' not implemented!"
+        self.RecordItemSelected(event)
         event.Skip()
 
     def list_records_item_right_click(self, event):  # wxGlade: MainFrame.<event_handler>
@@ -472,10 +453,6 @@ class MyFileDropTarget(wx.FileDropTarget):
             self.window.EnumerateSource(
                 filename
             )
-
-            # evt = EvidenceLoadedEvent(myEVT_EVIDENCELOADED, -1)
-            # evt.SetClientData(filename)
-            # wx.PostEvent(self.window, evt)
 
         pass
 
