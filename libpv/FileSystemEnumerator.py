@@ -5,8 +5,12 @@ from dfvfs.lib import definitions
 from dfvfs.resolver import resolver
 from dfvfs.volume import volume_system,vshadow_volume_system
 from dfvfs.path import factory as path_spec_factory
+try:
+    from agw import pyprogress as pyprogress
+except ImportError:
+    import wx.lib.agw.pyprogress as pyprogress
 
-def EnumerateNode(mainFrame,tree_item,node):
+def EnumerateNode(mainFrame,tree_item,node,dlg_flag=True):
     if isinstance(node, source_scanner.SourceScanNode):
         if (node.type_indicator == definitions.TYPE_INDICATOR_TSK or
             node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW):
@@ -28,6 +32,17 @@ def EnumerateNode(mainFrame,tree_item,node):
                     print str(error)
 
                 if file_system is not None:
+                    if dlg_flag:
+                        dlg = pyprogress.PyProgress(
+                            mainFrame,
+                            -1,
+                            "Enumerating Filesystem",
+                            "This can take a while",
+                            agwStyle=wx.PD_APP_MODAL | wx.PD_ELAPSED_TIME
+                        )
+                        dlg.SetGaugeProportion(.10)
+                        dlg.SetGaugeSteps(100)
+
                     file_entry = file_system.GetRootFileEntry()
 
                     ProcessFolder(
@@ -35,14 +50,23 @@ def EnumerateNode(mainFrame,tree_item,node):
                         file_entry,
                         u'',
                         tree_fs=mainFrame.tree_fs,
-                        tree_item=tree_item
+                        tree_item=tree_item,
+                        dlg=dlg
                     )
 
-def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_item=None):
+                    if dlg_flag:
+                        dlg.Destroy()
+
+def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_item=None,dlg=None,fcnt=0):
     full_path = parent_full_path + u'/' + file_entry.name
+
+    fcnt += 1
+    if dlg:
+        if fcnt % 8 == 0:
+            dlg.UpdatePulse()
+
     file_entry.full_path = full_path
     if file_entry.IsDirectory():
-        #print full_path.encode('utf-8', u'replace')
         if tree_item:
             entry_name = file_entry.name
 
@@ -67,7 +91,15 @@ def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_it
             folder_tree_item = None
 
     for sub_file_entry in file_entry.sub_file_entries:
-        ProcessFolder(file_system, sub_file_entry, full_path,tree_fs=tree_fs,tree_item=folder_tree_item)
+        ProcessFolder(
+            file_system,
+            sub_file_entry,
+            full_path,
+            tree_fs=tree_fs,
+            tree_item=folder_tree_item,
+            dlg=dlg,
+            fcnt=fcnt
+        )
 
 def SetNodeIcons(file_entry, tree_fs, tree_item):
     icon_list = GetIcons(
