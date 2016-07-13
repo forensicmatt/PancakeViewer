@@ -28,7 +28,6 @@ def EnumerateNode(mainFrame,tree_item,node):
                     print str(error)
 
                 if file_system is not None:
-                    #file_entry = resolver.Resolver.OpenFileEntry(node.path_spec)
                     file_entry = file_system.GetRootFileEntry()
 
                     ProcessFolder(
@@ -37,8 +36,7 @@ def EnumerateNode(mainFrame,tree_item,node):
                         u'',
                         tree_fs=mainFrame.tree_fs,
                         tree_item=tree_item
-                )
-    pass
+                    )
 
 def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_item=None):
     full_path = parent_full_path + u'/' + file_entry.name

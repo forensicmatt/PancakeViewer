@@ -70,7 +70,6 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
             tree_item,
             _root_node
         )
-        pass
 
     def PrintDriveLayout(self):
         #Get Root node#
