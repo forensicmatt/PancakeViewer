@@ -328,7 +328,6 @@ class MainFrame(wx.Frame):
                 file_entry._file_system.Open(file_entry.path_spec)
 
             for sub_file_entry in file_entry.sub_file_entries:
-                self.entry_cnt += 1
                 print sub_file_entry.name
                 self.list_records.InsertRecord(sub_file_entry,file_entry.full_path)
 
