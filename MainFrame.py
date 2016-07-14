@@ -364,7 +364,10 @@ class RecordDVListCtrl(dataview.DataViewListCtrl):
 
     def InsertRecord(self,node,path):
         if isinstance(node, tsk_file_entry.TSKFileEntry):
-            meta = node._tsk_file.info.meta
+            # Open our tsk file, because it is not guaranteed that node._tsk_file is open
+            tskfile = node.GetTSKFile()
+            # Get meta for tsk file
+            meta = tskfile.info.meta
 
             # Set data node #
             new_node = copy.copy(node)
