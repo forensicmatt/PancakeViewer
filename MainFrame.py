@@ -85,7 +85,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.tree_fs_item_expanded, self.tree_fs)
         self.Bind(wx.EVT_TREE_SEL_CHANGING, self.tree_fs_sel_changing, self.tree_fs)
         # end wxGlade
-
+        self._InitRecordPaneMenu()
         self._InitRecordView()
         self.evidenceManager = EvidenceManager(
             self
@@ -197,6 +197,22 @@ class MainFrame(wx.Frame):
 
     def list_records_item_right_click(self, event):  # wxGlade: MainFrame.<event_handler>
         print "Event handler 'list_records_item_right_click' not implemented!"
+
+        column = event.GetDataViewColumn()
+
+        if column:
+            # Get all selected items #
+            if self.list_records.HasSelection():
+                selected_cnt = self.list_records.GetSelectedItemsCount()
+                selected_items = self.list_records.GetSelections()
+
+                # Get right click item #
+                right_click_item = event.GetItem()
+
+                # If id is > 0, record is selected
+                if right_click_item.ID > 0:
+                    self.PopupMenu(self.record_pane_menu)
+
         event.Skip()
 
     def OpenSource(self, event):  # wxGlade: MainFrame.<event_handler>
@@ -276,6 +292,22 @@ class MainFrame(wx.Frame):
         self.Bind(dataview.EVT_DATAVIEW_ITEM_ACTIVATED, self.list_records_item_activated, self.list_records)
         self.Bind(dataview.EVT_DATAVIEW_ITEM_CONTEXT_MENU, self.list_records_item_right_click, self.list_records)
 
+    def _InitRecordPaneMenu(self):
+        # make a menu
+        self.record_pane_menu = wx.Menu()
+
+        # Create IDs #
+        self.record_pane_popup_id1 = wx.NewId()
+
+        # Create Binds #
+        self.Bind(wx.EVT_MENU, self.RecordPaneMenu_ExtractClick, id=self.record_pane_popup_id1)
+
+        # Create Items #
+        self.record_pane_menu.Append(self.record_pane_popup_id1, "Extract")
+
+    def RecordPaneMenu_ExtractClick(self,event):
+        print 'RecordPaneMenu_ExtractClick'
+
     def RecordItemSelected(self,event):
         item = event.GetItem()
         value = event.GetValue()
@@ -328,7 +360,6 @@ class MainFrame(wx.Frame):
                 file_entry._file_system.Open(file_entry.path_spec)
 
             for sub_file_entry in file_entry.sub_file_entries:
-                print sub_file_entry.name
                 self.list_records.InsertRecord(sub_file_entry,file_entry.full_path)
 
     def OpenLogical(self, event):  # wxGlade: MainFrame.<event_handler>
