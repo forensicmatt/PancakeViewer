@@ -6,6 +6,7 @@
 import os
 import sys
 import copy
+from ExtractionDialog import ExtractionDialog
 import wx
 import wx.dataview as dataview
 import wx.lib.mixins.listctrl as listmix
@@ -62,7 +63,7 @@ class MainFrame(wx.Frame):
         self.window_1_pane_2 = wx.Panel(self.window_1, wx.ID_ANY, style=wx.BORDER_SIMPLE | wx.TAB_TRAVERSAL)
         self.window_3 = wx.SplitterWindow(self.window_1_pane_2, wx.ID_ANY)
         self.window_3_pane_1 = wx.Panel(self.window_3, wx.ID_ANY)
-        self.list_records = RecordDVListCtrl(self.window_3_pane_1, wx.ID_ANY,style=wx.BORDER_THEME | dataview.DV_ROW_LINES | dataview.DV_VERT_RULES | dataview.DV_MULTIPLE)
+        self.list_records = RecordDVListCtrl(self.window_3_pane_1, wx.ID_ANY, style=wx.BORDER_THEME | dataview.DV_ROW_LINES | dataview.DV_VERT_RULES | dataview.DV_MULTIPLE)
         self.window_3_pane_2 = wx.Panel(self.window_3, wx.ID_ANY)
         self.notebook_2 = wx.Notebook(self.window_3_pane_2, wx.ID_ANY, style=wx.NB_MULTILINE)
         self.notebook_2_pane_1 = wx.Panel(self.notebook_2, wx.ID_ANY)
@@ -147,7 +148,7 @@ class MainFrame(wx.Frame):
         self.notebook_2.AddPage(self.notebook_2_pane_2, _("Text"))
         sizer_7.Add(self.notebook_2, 1, wx.EXPAND, 0)
         self.window_3_pane_2.SetSizer(sizer_7)
-        self.window_3.SplitHorizontally(self.window_3_pane_1, self.window_3_pane_2, 300)
+        self.window_3.SplitHorizontally(self.window_3_pane_1, self.window_3_pane_2, 297)
         sizer_5.Add(self.window_3, 1, wx.EXPAND, 0)
         self.window_1_pane_2.SetSizer(sizer_5)
         self.window_1.SplitVertically(self.window_1_pane_1, self.window_1_pane_2, 173)
@@ -307,6 +308,10 @@ class MainFrame(wx.Frame):
 
     def RecordPaneMenu_ExtractClick(self,event):
         print 'RecordPaneMenu_ExtractClick'
+        dlg = ExtractionDialog(self)
+        result = dlg.ShowModal()
+
+        pass
 
     def RecordItemSelected(self,event):
         item = event.GetItem()
