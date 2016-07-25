@@ -165,7 +165,4 @@ class ExtractionDialog(wx.Dialog):
         dlg.Destroy()
 
         event.Skip()
-    def button_browse_path_click(self, event):  # wxGlade: ExtractionDialog.<event_handler>
-        print "Event handler 'button_browse_path_click' not implemented!"
-        event.Skip()
 # end of class ExtractionDialog
