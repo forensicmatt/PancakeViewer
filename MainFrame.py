@@ -311,6 +311,20 @@ class MainFrame(wx.Frame):
         dlg = ExtractionDialog(self)
         result = dlg.ShowModal()
 
+        if result == wx.ID_OK:
+            # Extraction Process #
+            selected_names = []
+            selected_items = self.list_records.GetSelections()
+
+            for item in selected_items:
+                data_index = self.list_records.GetItemData(item)
+                data = self.list_records.data[data_index - 1] #based on zero index
+                selected_names.append(data.full_path)
+                pass
+
+            print(u'Items to extract: {}'.format(selected_names))
+            pass
+
         pass
 
     def RecordItemSelected(self,event):
