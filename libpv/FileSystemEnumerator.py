@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import wx
 from dfvfs.helpers import source_scanner
 from dfvfs.lib import definitions
@@ -25,10 +24,8 @@ def EnumerateNode(mainFrame,tree_item,node,dlg_flag=True):
                     path_spec = node.path_spec
                     if node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW:
                         path_spec = path_spec_factory.Factory.NewPathSpec(
-                            definitions.TYPE_INDICATOR_TSK,
-                            location=u'/',
-                            parent=node.path_spec
-                        )
+                            definitions.TYPE_INDICATOR_TSK, location=u'/',
+                            parent=node.path_spec)
                     file_system = resolver.Resolver.OpenFileSystem(path_spec)
                 except Exception as error:
                     file_system = None
@@ -61,7 +58,7 @@ def EnumerateNode(mainFrame,tree_item,node,dlg_flag=True):
                         dlg.Destroy()
 
 def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_item=None,dlg=None,fcnt=0):
-    full_path = os.path.join(parent_full_path,file_entry.name)
+    full_path = parent_full_path + u'/' + file_entry.name
 
     fcnt += 1
     if dlg:
