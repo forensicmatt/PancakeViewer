@@ -319,217 +319,37 @@ class MainFrame(wx.Frame):
         result = dlg.ShowModal()
 
         if result == wx.ID_OK:
-            out_path = dlg.text_ctrl_outpath.GetValue()
-            # Create our file extractor #
-            # fileExtractor = FileExtractor(
-            #     out_path=dlg.text_ctrl_outpath.GetValue()
-            # )
-
             # Extraction Process #
             selected_items = self.list_records.GetSelections()
-            dfvfs_file_entry_list = []
 
+            # Get Filesystem Path Spec #
+            i1 = selected_items[0]
+            i1_index = self.list_records.GetItemData(i1)
+            i1_data = self.list_records.data[i1_index - 1]
+            fs_path_spec = i1_data._file_system._path_spec
+
+            # Create our file extractor #
+            fileExtractor = FileExtractor(
+                fs_path_spec,
+                dlg.text_ctrl_outpath.GetValue()
+            )
+
+            fileExtractor.start()
+
+            # Extraction Process #
             for item in selected_items:
                 data_index = self.list_records.GetItemData(item)
-                data = self.list_records.data[data_index - 1] #based on zero index
-                dfvfs_file_entry_list.append(data)
-            #     fileExtractor.AddFileToQueue(data)
-            #
-            # fileExtractor.Finish()
-            # fileExtractor.start()
+                data = self.list_records.data[data_index - 1]
+                fileExtractor.AddFileToQueue(
+                    data
+                )
 
-            total_size = self._GetTotalSize(dfvfs_file_entry_list)
-
-            prg_dlg = wx.ProgressDialog(
-                "File Extraction",
-                "Extracting Files",
-                maximum=total_size,
-                parent=self,
-                style=0
-                      | wx.PD_APP_MODAL
-                      | wx.PD_CAN_ABORT
-                      # | wx.PD_CAN_SKIP
-                      # | wx.PD_ELAPSED_TIME
-                      | wx.PD_ESTIMATED_TIME
-                      | wx.PD_REMAINING_TIME
-            )
-
-            self._ExportFiles(
-                dfvfs_file_entry_list,
-                out_path,
-                prg_dlg
-            )
-
-            #print(u'Items to extract: {}'.format(selected_names))
-            #fileExtractor.join()
-
-            # Finished exporting #
-            prg_dlg.Destroy()
+            fileExtractor.Finish()
 
             print(u'File extractor finished!')
             pass
 
         pass
-
-    def _ExportFiles(self,dfvfs_file_entry_list,out_path,prg_dlg,bytes_read=0):
-        for file_entry in dfvfs_file_entry_list:
-            if file_entry.IsFile():
-                export_name = self._GetExportFilename(
-                    out_path,
-                    file_entry.full_path
-                )
-                result = self._ExportFile(
-                    file_entry,
-                    export_name,
-                    bytes_read,
-                    prg_dlg
-                )
-                if result:
-                    logging.info(u"Exported {}".format(file_entry.full_path))
-                else:
-                    logging.error(u"{} Not Exported".format(file_entry.full_path))
-            elif file_entry.IsDirectory():
-                # Hold sub entries here #
-                sub_dfvfs_file_entry_list = []
-                for sub_file_entry in file_entry.sub_file_entries:
-                    # Add fullpath info here #
-                    # TODO #
-
-                    # Look for ads here #
-                    # TODO #
-
-                    # Append file entry #
-                    sub_dfvfs_file_entry_list.append(
-                        sub_file_entry
-                    )
-
-                # Need to update outpath for folder #
-                # TODO #
-                out_path = out_path
-
-                self._ExportFiles(
-                    sub_dfvfs_file_entry_list,
-                    out_path,
-                    prg_dlg,
-                    bytes_read=bytes_read
-                )
-            else:
-                logging.warning(u"Currently only exporting files. {} is not type file".format(file_entry.full_path))
-
-    def _GetExportFilename(self,export_path,filename):
-        """Create a export filename"""
-        export_filename = u''
-
-        name = os.path.basename(filename)
-        name = re.sub(':','.',name)
-        export_filename = os.path.join(export_path,name)
-
-        return export_filename
-
-    def _ExportFile(self,file_entry,export_filename,bytes_read,prg_dlg):
-        """Export a file"""
-        _offset = None
-
-        # Outfile #
-        outfile = open(export_filename,'wb')
-
-        data_stream_name = None
-        file_name = os.path.basename(file_entry.full_path)
-
-        prg_dlg.Update(
-            bytes_read,
-            u"Extracting File: {}".format(file_name)
-        )
-
-        tsk_file = file_entry._tsk_file
-        use_attribute = None
-
-        if ':' in file_name:
-            data_stream_name = file_name.split(':',1)[1]
-            for attribute in tsk_file:
-                if attribute.info.name == data_stream_name:
-                    use_attribute = attribute
-                    if data_stream_name == u'$J' and int(attribute.info.flags) & pytsk3.TSK_FS_ATTR_SPARSE:
-                        # If USN Journal, start at end of sparse data run #
-                        for run in attribute:
-                            print "   Blocks %s to %s (%s blocks) [flags: %s] - [offset: %d]" % (
-                                run.addr, run.addr + run.len, run.len, str(run.flags),run.offset
-                            )
-                            if run.flags != pytsk3.TSK_FS_ATTR_RUN_FLAG_SPARSE:
-                                _offset = run.offset * tsk_file.info.fs_info.block_size
-                                break
-                    break
-
-        if _offset is None:
-            _offset = 0
-
-        if use_attribute != None:
-            _filesize = use_attribute.info.size
-        else:
-            _filesize = tsk_file.info.meta.size
-
-        while _offset < _filesize:
-            available_to_read = min(self._READ_BUFFER_SIZE, _filesize - _offset)
-
-            if use_attribute != None:
-                data = tsk_file.read_random(
-                    _offset,
-                    available_to_read,
-                    use_attribute.info.type,
-                    use_attribute.info.id
-                )
-                pass
-            else:
-                data = tsk_file.read_random(
-                    _offset,
-                    available_to_read
-                )
-
-            if not data:
-                break
-
-            _offset += len(data)
-
-            outfile.write(data)
-            bytes_read += len(data)
-            prg_dlg.Update(bytes_read)
-
-        outfile.close()
-        return True
-
-    def _GetTotalSize(self,dfvfs_file_entry_list):
-        '''Get total size of files for progress bar'''
-        total_size = 0
-
-        for file_entry in dfvfs_file_entry_list:
-            tsk_file = file_entry._tsk_file
-
-            data_stream_name = None
-            file_name = os.path.basename(file_entry.full_path)
-
-            if ':' in file_name:
-                data_stream_name = file_name.split(':', 1)[1]
-                for attribute in tsk_file:
-                    if attribute.info.name == data_stream_name:
-                        use_attribute = attribute
-                        if data_stream_name == u'$J' and int(attribute.info.flags) & pytsk3.TSK_FS_ATTR_SPARSE:
-                            # If USN Journal, start at end of sparse data run #
-                            for run in attribute:
-                                print "   Blocks %s to %s (%s blocks) [flags: %s] - [offset: %d]" % (
-                                    run.addr, run.addr + run.len, run.len, str(run.flags), run.offset
-                                )
-                                if run.flags != pytsk3.TSK_FS_ATTR_RUN_FLAG_SPARSE:
-                                    _offset = run.offset * tsk_file.info.fs_info.block_size
-                                    total_size += (attribute.info.size - _offset)
-                                    break
-                        else:
-                            total_size += attribute.info.size
-
-                        break
-            else:
-                total_size += tsk_file.info.meta.size
-
-        return total_size
 
     def RecordItemSelected(self,event):
         item = event.GetItem()
