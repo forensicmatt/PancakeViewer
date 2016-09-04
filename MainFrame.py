@@ -286,8 +286,9 @@ class MainFrame(wx.Frame):
 
     def _InitRecordView(self):
         #http://docs.wxwidgets.org/3.0/classwx_data_view_ctrl.html
-        self.list_records.AppendTextColumn("Name", 0, width=170)
-        self.list_records.AppendTextColumn("Size", 1, width=170)
+        # self.list_records.AppendBitmapColumn("",0,width=20)
+        # self.list_records.AppendTextColumn("Name", 1, width=170)
+        # self.list_records.AppendTextColumn("Size", 2, width=170)
         # renderer = MyCustomRenderer(varianttype="long",mode=dataview.DATAVIEW_CELL_EDITABLE)
         # size_column = dataview.DataViewColumn("Size", renderer, 1, width=170)
         # self.list_records.AppendColumn(size_column)
@@ -428,7 +429,21 @@ class RecordDVListCtrl(dataview.DataViewListCtrl):
                  size=wx.DefaultSize, style=0):
         self.data = []
         self.current_parrent = None
+
         dataview.DataViewListCtrl.__init__(self, parent, ID, pos, size, style)
+
+        self.AppendBitmapColumn("", 0, width=20)
+        self.AppendTextColumn("Name", 1, width=170)
+        self.AppendTextColumn("Size", 2, width=170)
+        self._SetBitmaps()
+
+    def _SetBitmaps(self):
+        self.bmp_folder = wx.ArtProvider.GetBitmap(wx.ART_FOLDER, wx.ART_OTHER, (16, 16))
+        self.bmp_norm_file = wx.ArtProvider.GetBitmap(wx.ART_NORMAL_FILE, wx.ART_OTHER, (16, 16))
+        self.icons = {
+            'Folder': self.bmp_folder,
+            'File': self.bmp_norm_file
+        }
 
     def SetCurrentParrent(self,node):
         self.current_parrent = node
@@ -446,9 +461,19 @@ class RecordDVListCtrl(dataview.DataViewListCtrl):
             # Set data node #
             new_node = copy.copy(node)
             new_node.full_path = "{}/{}".format(path, node.name)
-            self.data.append(new_node)
+            self.data.append(
+                new_node
+            )
+
+            icon = self.icons['File']
+            if node.IsDirectory():
+                icon = self.icons['Folder']
+
             # data int is key to the node #
-            item = self.AppendItem([node.name, str(meta.size)],data=len(self.data))
+            item = self.AppendItem(
+                [icon, node.name, str(meta.size)],
+                data=len(self.data)
+            )
 
             for dstream in node.data_streams:
                 if len(dstream.name) > 0:
@@ -459,9 +484,15 @@ class RecordDVListCtrl(dataview.DataViewListCtrl):
                     # Set data node #
                     new_node = copy.copy(node)
                     new_node.full_path = "{}/{}".format(path,cname)
-                    self.data.append(new_node)
+
+                    self.data.append(
+                        new_node
+                    )
                     # data int is key to the node #
-                    item = self.AppendItem([cname, str(attr.size)],data=len(self.data))
+                    item = self.AppendItem(
+                        [icon, cname, str(attr.size)],
+                        data=len(self.data)
+                    )
                     pass
 
 class UIntRenderer(dataview.DataViewCustomRenderer):
