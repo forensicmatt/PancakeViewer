@@ -27,6 +27,7 @@ Currently not sure how to implement a method for viewing objects (files, volumes
 # Example view
 ![Viewing VSS](https://github.com/forensicmatt/PancakeViewer/blob/master/resources/example001.png)
 ![Extraction Options](https://github.com/forensicmatt/PancakeViewer/blob/master/resources/example002.png)
+![Extraction Results](https://github.com/forensicmatt/PancakeViewer/blob/master/resources/example003.png)
 
 # More Talk
 Forensic Lunch - 20160715
