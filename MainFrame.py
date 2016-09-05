@@ -201,6 +201,29 @@ class MainFrame(wx.Frame):
     def list_records_item_activated(self, event):  # wxGlade: MainFrame.<event_handler>
         print "Event handler 'list_records_item_activated' not implemented!"
         self.RecordItemSelected(event)
+
+        item = event.GetItem()
+
+        rpnt = self.list_records.GetItemData(item) - 1  # On a zero index
+        rnode = self.list_records.data[rpnt]
+
+        if rnode.IsDirectory():
+            current_folder = self.tree_fs.GetSelection()
+            current_item, cookie = self.tree_fs.GetFirstChild(current_folder)
+            while current_item.IsOk():
+                # Get node #
+                cnode = self.tree_fs.GetItemData(current_item).Data
+
+                # Check Node #
+                if cnode.name == rnode.name:
+                    self.tree_fs.SelectItem(current_item)
+                    break
+
+                # Get next node #
+                current_item, cookie = self.tree_fs.GetNextChild(current_folder,cookie)
+
+            pass
+
         event.Skip()
 
     def list_records_item_right_click(self, event):  # wxGlade: MainFrame.<event_handler>
