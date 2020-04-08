@@ -210,7 +210,7 @@ class MainFrame(wx.Frame):
             current_item, cookie = self.tree_fs.GetFirstChild(current_folder)
             while current_item.IsOk():
                 # Get node #
-                cnode = self.tree_fs.GetItemData(current_item).Data
+                cnode = self.tree_fs.GetItemData(current_item)
 
                 # Check Node #
                 if cnode.name == rnode.name:
@@ -249,7 +249,7 @@ class MainFrame(wx.Frame):
             self,
             message="Choose Image",
             wildcard="All files (*.*)|*.*",
-            style=wx.OPEN | wx.CHANGE_DIR
+            style=wx.FD_OPEN | wx.FD_CHANGE_DIR
         )
 
         if dlg.ShowModal() == wx.ID_OK:
@@ -387,7 +387,7 @@ class MainFrame(wx.Frame):
     def FsTreeItemSelected(self,event):
         print('FsTreeItemSelected')
         item = event.GetItem()
-        node = self.tree_fs.GetItemData(item).Data
+        node = self.tree_fs.GetItemData(item)
 
         # Set Properties
         self._SetProperties(node)
