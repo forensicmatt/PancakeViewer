@@ -238,9 +238,15 @@ class MainFrame(wx.Frame):
                 # Get right click item #
                 right_click_item = event.GetItem()
 
+                # TODO
+                # When you right click outside of the record area, there is a crash
+                # in old wx, we could get the id and it was set to 0 if it was outside the listed
+                # records. But now comparing id with > causes error in new wx... this needs looking
+                # into.
                 # If id is > 0, record is selected
-                if right_click_item.ID > 0:
-                    self.PopupMenu(self.record_pane_menu)
+                # if right_click_item.ID > 0:
+                #     self.PopupMenu(self.record_pane_menu)
+                self.PopupMenu(self.record_pane_menu)
 
         event.Skip()
 
