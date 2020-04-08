@@ -40,33 +40,35 @@ import wx.propgrid
 class MainFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: MainFrame.__init__
+        kwds["style"] = kwds.get("style", 0)
         wx.Frame.__init__(self, *args, **kwds)
+        self.SetSize((978, 584))
         
         # Menu Bar
         self.MainFrame_menubar = wx.MenuBar()
         self.File = wx.Menu()
-        self.Open = wx.MenuItem(self.File, wx.ID_ANY, _("Open Image"), "", wx.ITEM_NORMAL)
-        self.File.AppendItem(self.Open)
-        self.openLogical = wx.MenuItem(self.File, wx.ID_ANY, _("Open Logical"), "", wx.ITEM_NORMAL)
-        self.File.AppendItem(self.openLogical)
+        self.MainFrame_menubar.Open = self.File.Append(wx.ID_ANY, _("Open Image"), "")
+        self.Bind(wx.EVT_MENU, self.OpenSource, id=self.MainFrame_menubar.Open.GetId())
+        self.MainFrame_menubar.openLogical = self.File.Append(wx.ID_ANY, _("Open Logical"), "")
+        self.Bind(wx.EVT_MENU, self.OpenLogical, id=self.MainFrame_menubar.openLogical.GetId())
         self.File.AppendSeparator()
-        self.Exit = wx.MenuItem(self.File, wx.ID_ANY, _("Exit"), "", wx.ITEM_NORMAL)
-        self.File.AppendItem(self.Exit)
+        self.MainFrame_menubar.Exit = self.File.Append(wx.ID_ANY, _("Exit"), "")
+        self.Bind(wx.EVT_MENU, self.ExitApplication, id=self.MainFrame_menubar.Exit.GetId())
         self.MainFrame_menubar.Append(self.File, _("File"))
         self.SetMenuBar(self.MainFrame_menubar)
         # Menu Bar end
         self.MainFrame_statusbar = self.CreateStatusBar(1)
-        self.window_1 = wx.SplitterWindow(self, wx.ID_ANY)
+        self.window_1 = wx.SplitterWindow(self, wx.ID_ANY, style=0)
         self.window_1_pane_1 = wx.Panel(self.window_1, wx.ID_ANY)
-        self.window_2 = wx.SplitterWindow(self.window_1_pane_1, wx.ID_ANY)
+        self.window_2 = wx.SplitterWindow(self.window_1_pane_1, wx.ID_ANY, style=0)
         self.window_2_pane_1 = wx.Panel(self.window_2, wx.ID_ANY)
         self.tree_fs = wx.TreeCtrl(self.window_2_pane_1, wx.ID_ANY, style=wx.TR_HAS_BUTTONS | wx.TR_HIDE_ROOT)
         self.window_2_pane_2 = wx.Panel(self.window_2, wx.ID_ANY, style=wx.BORDER_SIMPLE | wx.TAB_TRAVERSAL)
-        self.notebook_1 = wx.Notebook(self.window_2_pane_2, wx.ID_ANY)
+        self.notebook_1 = wx.Notebook(self.window_2_pane_2, wx.ID_ANY, style=0)
         self.notebook_1_pane_1 = wx.Panel(self.notebook_1, wx.ID_ANY)
         self.property_grid_1 = PropertyGrid(self.notebook_1_pane_1, wx.ID_ANY)
         self.window_1_pane_2 = wx.Panel(self.window_1, wx.ID_ANY, style=wx.BORDER_SIMPLE | wx.TAB_TRAVERSAL)
-        self.window_3 = wx.SplitterWindow(self.window_1_pane_2, wx.ID_ANY)
+        self.window_3 = wx.SplitterWindow(self.window_1_pane_2, wx.ID_ANY, style=0)
         self.window_3_pane_1 = wx.Panel(self.window_3, wx.ID_ANY)
         self.list_records = RecordDVListCtrl(self.window_3_pane_1, wx.ID_ANY, style=wx.BORDER_THEME | dataview.DV_ROW_LINES | dataview.DV_VERT_RULES | dataview.DV_MULTIPLE)
         self.window_3_pane_2 = wx.Panel(self.window_3, wx.ID_ANY)
@@ -79,16 +81,13 @@ class MainFrame(wx.Frame):
         self.__set_properties()
         self.__do_layout()
 
-        self.Bind(wx.EVT_MENU, self.OpenSource, self.Open)
-        self.Bind(wx.EVT_MENU, self.OpenLogical, self.openLogical)
-        self.Bind(wx.EVT_MENU, self.ExitApplication, self.Exit)
+        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.tree_fs_item_activated, self.tree_fs)
+        self.Bind(wx.EVT_TREE_ITEM_COLLAPSED, self.tree_fs_item_collapsed, self.tree_fs)
+        self.Bind(wx.EVT_TREE_ITEM_COLLAPSING, self.tree_fs_item_collapsing, self.tree_fs)
+        self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.tree_fs_item_expanded, self.tree_fs)
+        self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.tree_fs_item_expanding, self.tree_fs)
         self.Bind(wx.EVT_TREE_ITEM_GETTOOLTIP, self.tree_fs_item_gettooltip, self.tree_fs)
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.tree_fs_sel_changed, self.tree_fs)
-        self.Bind(wx.EVT_TREE_ITEM_EXPANDING, self.tree_fs_item_expanding, self.tree_fs)
-        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.tree_fs_item_activated, self.tree_fs)
-        self.Bind(wx.EVT_TREE_ITEM_COLLAPSING, self.tree_fs_item_collapsing, self.tree_fs)
-        self.Bind(wx.EVT_TREE_ITEM_COLLAPSED, self.tree_fs_item_collapsed, self.tree_fs)
-        self.Bind(wx.EVT_TREE_ITEM_EXPANDED, self.tree_fs_item_expanded, self.tree_fs)
         self.Bind(wx.EVT_TREE_SEL_CHANGING, self.tree_fs_sel_changing, self.tree_fs)
         # end wxGlade
         self._READ_BUFFER_SIZE = 32768
@@ -111,7 +110,6 @@ class MainFrame(wx.Frame):
     def __set_properties(self):
         # begin wxGlade: MainFrame.__set_properties
         self.SetTitle(_("Pancake Viewer"))
-        self.SetSize((978, 584))
         self.MainFrame_statusbar.SetStatusWidths([-1])
         
         # statusbar fields
@@ -165,12 +163,12 @@ class MainFrame(wx.Frame):
         # end wxGlade
 
     def tree_fs_item_changed(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'tree_fs_item_changed'"
+        print("Event handler 'tree_fs_item_changed'")
         self.FsTreeItemSelected(event)
         event.Skip()
 
     def tree_fs_item_expanding(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'tree_fs_item_expanding' not implemented!"
+        print("Event handler 'tree_fs_item_expanding' not implemented!")
         event.Skip()
 
     def tree_fs_item_activated(self, event):  # wxGlade: MainFrame.<event_handler>
@@ -178,28 +176,28 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def tree_fs_item_collapsing(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'tree_fs_item_collapsing' not implemented!"
+        print("Event handler 'tree_fs_item_collapsing' not implemented!")
         event.Skip()
 
     def tree_fs_item_collapsed(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'tree_fs_item_collapsed' not implemented!"
+        print("Event handler 'tree_fs_item_collapsed' not implemented!")
         event.Skip()
 
     def tree_fs_item_expanded(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'tree_fs_item_expanded' not implemented!"
+        print("Event handler 'tree_fs_item_expanded' not implemented!")
         event.Skip()
 
     def tree_fs_item_changing(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'tree_fs_item_changing'"
+        print("Event handler 'tree_fs_item_changing'")
         event.Skip()
 
     def list_records_item_changed(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_item_changed' not implemented!"
+        print("Event handler 'list_records_item_changed' not implemented!")
         self.RecordItemSelected(event)
         event.Skip()
 
     def list_records_item_activated(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_item_activated' not implemented!"
+        print("Event handler 'list_records_item_activated' not implemented!")
         self.RecordItemSelected(event)
 
         item = event.GetItem()
@@ -227,7 +225,7 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def list_records_item_right_click(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'list_records_item_right_click' not implemented!"
+        print("Event handler 'list_records_item_right_click' not implemented!")
 
         column = event.GetDataViewColumn()
 
@@ -264,7 +262,7 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def ExitApplication(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'ExitApplication' not implemented!"
+        print("Event handler 'ExitApplication' not implemented!")
         event.Skip()
 
     def LoadIconList(self):
@@ -296,7 +294,7 @@ class MainFrame(wx.Frame):
         )
 
     def tree_fs_item_gettooltip(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'tree_fs_item_gettooltip' not implemented!"
+        print("Event handler 'tree_fs_item_gettooltip' not implemented!")
         event.Skip()
 
     def tree_fs_sel_changed(self, event):  # wxGlade: MainFrame.<event_handler>
@@ -304,7 +302,7 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def tree_fs_sel_changing(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'tree_fs_sel_changing' not implemented!"
+        print("Event handler 'tree_fs_sel_changing' not implemented!")
         event.Skip()
 
     def _InitRecordView(self):
@@ -338,7 +336,7 @@ class MainFrame(wx.Frame):
         self.record_pane_menu.Append(self.record_pane_popup_id1, "Extract")
 
     def RecordPaneMenu_ExtractClick(self,event):
-        print 'RecordPaneMenu_ExtractClick'
+        print('RecordPaneMenu_ExtractClick')
         dlg = ExtractionDialog(self)
         result = dlg.ShowModal()
 
@@ -400,7 +398,7 @@ class MainFrame(wx.Frame):
         # Populate Records Pane
         self._PopulateRecords(item,node)
 
-        print item
+        print(item)
 
     def _SetProperties(self,node):
         Properties.EnumerateProperties(
@@ -430,7 +428,7 @@ class MainFrame(wx.Frame):
                 self.list_records.InsertRecord(sub_file_entry,file_entry.full_path)
 
     def OpenLogical(self, event):  # wxGlade: MainFrame.<event_handler>
-        print "Event handler 'OpenLogical' not implemented!"
+        print("Event handler 'OpenLogical' not implemented!")
         volumeDialog = LogicalVolumeDialog(
             self,
             -1
@@ -631,11 +629,11 @@ class EvidenceLoadedEvent(wx.PyCommandEvent):
         wx.PyCommandEvent.__init__(self, etype, eid)
         self._value = value
 
-        print 'EVIDENCELOADED EVENT'
+        print('EVIDENCELOADED EVENT')
 
     def GetValue(self):
         """Returns the value from the event.
         @return: the value of this event
 
         """
-        print 'EVIDENCELOADED EVENT'
+        print('EVIDENCELOADED EVENT')

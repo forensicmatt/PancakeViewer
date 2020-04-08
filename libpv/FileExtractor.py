@@ -62,8 +62,8 @@ class FileExtractor(multiprocessing.Process):
                 )
             else:
                 print(u"Item type unhandled for type: {}; {}".format(
-                    unicode(type(file_item)),
-                    unicode(file_item)
+                    type(file_item),
+                    file_item
                 ))
 
         file_system.Close()
@@ -169,9 +169,6 @@ class FileExtractor(multiprocessing.Process):
                     if data_stream_name == u'$J' and int(attribute.info.flags) & pytsk3.TSK_FS_ATTR_SPARSE:
                         # If USN Journal, start at end of sparse data run #
                         for run in attribute:
-                            print "   Blocks %s to %s (%s blocks) [flags: %s] - [offset: %d]" % (
-                                run.addr, run.addr + run.len, run.len, str(run.flags), run.offset
-                            )
                             if run.flags != pytsk3.TSK_FS_ATTR_RUN_FLAG_SPARSE:
                                 _offset = run.offset * tsk_file.info.fs_info.block_size
                                 break

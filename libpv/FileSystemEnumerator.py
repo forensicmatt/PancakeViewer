@@ -32,7 +32,7 @@ def EnumerateNode(mainFrame,tree_item,node,dlg_flag=True):
                     file_system = resolver.Resolver.OpenFileSystem(path_spec)
                 except Exception as error:
                     file_system = None
-                    print str(error)
+                    print(str(error))
 
                 if file_system is not None:
                     if dlg_flag:

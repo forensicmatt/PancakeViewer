@@ -14,12 +14,13 @@ import wx
 class LogicalVolumeDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: LogicalVolumeDialog.__init__
+        kwds["style"] = kwds.get("style", 0)
         wx.Dialog.__init__(self, *args, **kwds)
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
         self.panel_4 = wx.Panel(self, wx.ID_ANY)
-        self.label_1 = wx.StaticText(self, wx.ID_ANY, _("Select Logical Volume: "), style=wx.ALIGN_CENTER_HORIZONTAL)
+        self.label_1 = wx.StaticText(self, wx.ID_ANY, _("Select Logical Volume: "))
         self.panel_7 = wx.Panel(self, wx.ID_ANY)
-        self.combo_logical_volumes = wx.ComboBox(self, wx.ID_ANY, choices=[], style=wx.CB_DROPDOWN)
+        self.combo_logical_volumes = wx.ComboBox(self, wx.ID_ANY, choices=[], style=0)
         self.panel_8 = wx.Panel(self, wx.ID_ANY)
         self.panel_3 = wx.Panel(self, wx.ID_ANY)
         self.panel_5 = wx.Panel(self, wx.ID_ANY)
@@ -32,8 +33,8 @@ class LogicalVolumeDialog(wx.Dialog):
         self.__set_properties()
         self.__do_layout()
 
-        self.Bind(wx.EVT_BUTTON, self.button_select_click, id=wx.ID_OK)
-        self.Bind(wx.EVT_BUTTON, self.button_cancel_click, id=wx.ID_CANCEL)
+        self.Bind(wx.EVT_BUTTON, self.button_select_click, self.button_select)
+        self.Bind(wx.EVT_BUTTON, self.button_cancel_click, self.button_cancel)
         # end wxGlade
 
         self.PopulateVolumes()
@@ -79,10 +80,10 @@ class LogicalVolumeDialog(wx.Dialog):
         # end wxGlade
 
     def button_select_click(self, event):  # wxGlade: LogicalVolumeDialog.<event_handler>
-        print "Event handler 'button_select_click' not implemented!"
+        print("Event handler 'button_select_click' not implemented!")
         event.Skip()
     def button_cancel_click(self, event):  # wxGlade: LogicalVolumeDialog.<event_handler>
-        print "Event handler 'button_cancel_click' not implemented!"
+        print("Event handler 'button_cancel_click' not implemented!")
         event.Skip()
 
     def PopulateVolumes(self):
