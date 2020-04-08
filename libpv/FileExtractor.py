@@ -35,8 +35,8 @@ class FileExtractor(multiprocessing.Process):
         # Read from the queue #
         while True:
             file_item = self.file_queue.get()
-            if isinstance(file_item,unicode):
-                if (file_item == u'TERMINATE'):
+            if isinstance(file_item, str):
+                if file_item == 'TERMINATE':
                     break
             elif isinstance(file_item,ExtractionInfo):
                 # Get dfvfs file entry from our path_spec #
