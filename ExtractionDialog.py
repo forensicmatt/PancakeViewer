@@ -14,7 +14,9 @@ import wx
 class ExtractionDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: ExtractionDialog.__init__
+        kwds["style"] = kwds.get("style", 0)
         wx.Dialog.__init__(self, *args, **kwds)
+        self.SetSize((479, 243))
         self.panel_21 = wx.Panel(self, wx.ID_ANY)
         self.panel_22 = wx.Panel(self, wx.ID_ANY)
         self.label_2 = wx.StaticText(self, wx.ID_ANY, _("Extraction Location: "))
@@ -118,15 +120,15 @@ class ExtractionDialog(wx.Dialog):
         # end wxGlade
 
     def radio_box_selection_clicked(self, event):  # wxGlade: ExtractionDialog.<event_handler>
-        print "Event handler 'radio_box_selection_clicked' not implemented!"
+        print("Event handler 'radio_box_selection_clicked' not implemented!")
         event.Skip()
 
     def button_extract_click(self, event):  # wxGlade: ExtractionDialog.<event_handler>
-        print "Event handler 'button_extract_click' not implemented!"
+        print("Event handler 'button_extract_click' not implemented!")
         self.EndModal(wx.ID_OK)
 
     def button_cancel_click(self, event):  # wxGlade: ExtractionDialog.<event_handler>
-        print "Event handler 'button_cancel_click' not implemented!"
+        print("Event handler 'button_cancel_click' not implemented!")
         self.EndModal(wx.ID_CANCEL )
 
     def _InitCheckboxes(self):
@@ -150,7 +152,7 @@ class ExtractionDialog(wx.Dialog):
         self.checklistbox_options.SetSelection(index)
 
     def button_browse_path_click(self, event):
-        print "Event handler 'button_browse_path_click' not implemented!"
+        print("Event handler 'button_browse_path_click' not implemented!")
         dlg = wx.DirDialog(
             self,
             "Choose a directory:",
@@ -164,5 +166,8 @@ class ExtractionDialog(wx.Dialog):
 
         dlg.Destroy()
 
+        event.Skip()
+    def button_browse_path_click(self, event):  # wxGlade: ExtractionDialog.<event_handler>
+        print("Event handler 'button_browse_path_click' not implemented!")
         event.Skip()
 # end of class ExtractionDialog

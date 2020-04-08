@@ -2,6 +2,7 @@
 import wx
 import os
 import re
+import logging
 from dfvfs.credentials import manager as credentials_manager
 from dfvfs.path import factory as path_spec_factory
 from dfvfs.helpers import source_scanner
@@ -98,11 +99,11 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
     def _ProcessFile(self,file_system, file_entry, parent_full_path):
         full_path = parent_full_path + u'/' + file_entry.name
 
-        print full_path.encode('utf-8',u'replace')
+        print(full_path.encode('utf-8',u'replace'))
 
         for data_stream in file_entry.data_streams:
             if data_stream.name:
-                print u'{}:{}'.format(full_path, data_stream.name).encode('utf-8',u'replace')
+                print(u'{}:{}'.format(full_path, data_stream.name).encode('utf-8',u'replace'))
 
         for sub_file_entry in file_entry.sub_file_entries:
             self._ProcessFile(file_system, sub_file_entry, full_path)
@@ -176,7 +177,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
         return alias
 
     def _ProcessNode(self,tree_fs,parent_item,scan_node):
-        print '{}'.format(scan_node.type_indicator)
+        print('{}'.format(scan_node.type_indicator))
 
         # Get alias
         alias = self._GetAlias(scan_node)
@@ -202,10 +203,10 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
             tree_item = parent_item
 
         if (scan_node.type_indicator == definitions.TYPE_INDICATOR_TSK):
-            print 'FILESYSTEM'
+            print('FILESYSTEM')
             #self._ProcessFs(scan_node.path_spec)
         elif (scan_node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW):
-            print 'FILESYSTEM [VSS]'
+            print('FILESYSTEM [VSS]')
             path_spec = factory.Factory.NewPathSpec(
                 definitions.TYPE_INDICATOR_TSK,
                 location=u'/',
