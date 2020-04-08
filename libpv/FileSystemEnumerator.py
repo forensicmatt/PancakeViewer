@@ -80,13 +80,11 @@ def ProcessFolder(file_system, file_entry, parent_full_path,tree_fs=None,tree_it
                 tree_item,
                 entry_name
             )
-            item_data = wx.TreeItemData(
-                file_entry
-            )
+
             # Set Client Data
             tree_fs.SetItemData(
                 folder_tree_item,
-                item_data
+                file_entry
             )
             # Set Icons for this node
             SetNodeIcons(file_entry, tree_fs, folder_tree_item)
