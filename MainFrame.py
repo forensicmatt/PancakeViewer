@@ -282,9 +282,9 @@ class MainFrame(wx.Frame):
             isz[1],
         )
 
-        self.tree_fs.icon_fldridx = self.tree_fs.icon_list.AddIcon(folder)
-        self.tree_fs.icon_fldropenidx = self.tree_fs.icon_list.AddIcon(folder_open)
-        self.tree_fs.icon_fileidx = self.tree_fs.icon_list.AddIcon(wx.ArtProvider.GetIcon(wx.ART_NORMAL_FILE, wx.ART_OTHER, isz))
+        self.tree_fs.icon_fldridx = self.tree_fs.icon_list.Add(folder)
+        self.tree_fs.icon_fldropenidx = self.tree_fs.icon_list.Add(folder_open)
+        self.tree_fs.icon_fileidx = self.tree_fs.icon_list.Add(wx.ArtProvider.GetIcon(wx.ART_NORMAL_FILE, wx.ART_OTHER, isz))
 
         self.tree_fs.SetImageList(self.tree_fs.icon_list)
 
