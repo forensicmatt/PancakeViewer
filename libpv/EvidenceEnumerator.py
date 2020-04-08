@@ -12,8 +12,8 @@ from dfvfs.lib import definitions
 from dfvfs.path import factory
 from dfvfs.vfs import ntfs_file_system
 from dfvfs.volume import volume_system
+from libpv import Properties
 
-import Properties
 
 class EvidenceManager():
     def __init__(self,mainFrame):
