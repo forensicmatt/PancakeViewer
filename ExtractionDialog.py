@@ -105,7 +105,7 @@ class ExtractionDialog(wx.Dialog):
         sizer_20.Add(self.panel_19, 0, wx.EXPAND, 0)
         sizer_20.Add(self.checklistbox_options, 1, wx.EXPAND, 0)
         sizer_20.Add(self.panel_20, 0, wx.EXPAND, 0)
-        sizer_16.Add(sizer_20, 1, 0, 0)
+        sizer_16.Add(sizer_20, 0, wx.EXPAND, 0)
         sizer_16.Add(self.panel_12, 0, wx.EXPAND, 0)
         sizer_19.Add(self.panel_15, 1, wx.EXPAND, 0)
         sizer_19.Add(self.button_extract, 0, 0, 0)
@@ -151,7 +151,7 @@ class ExtractionDialog(wx.Dialog):
         print('Box %s is %schecked \n' % (label, status))
         self.checklistbox_options.SetSelection(index)
 
-    def button_browse_path_click(self, event):
+    def button_browse_path_click(self, event):  # wxGlade: ExtractionDialog.<event_handler>
         print("Event handler 'button_browse_path_click' not implemented!")
         dlg = wx.DirDialog(
             self,
@@ -167,7 +167,5 @@ class ExtractionDialog(wx.Dialog):
         dlg.Destroy()
 
         event.Skip()
-    def button_browse_path_click(self, event):  # wxGlade: ExtractionDialog.<event_handler>
-        print("Event handler 'button_browse_path_click' not implemented!")
-        event.Skip()
+
 # end of class ExtractionDialog

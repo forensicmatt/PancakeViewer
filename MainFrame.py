@@ -42,7 +42,7 @@ class MainFrame(wx.Frame):
         # begin wxGlade: MainFrame.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
-        self.SetSize((978, 312))
+        self.SetSize((1126, 685))
         
         # Menu Bar
         self.MainFrame_menubar = wx.MenuBar()
@@ -140,7 +140,7 @@ class MainFrame(wx.Frame):
         self.notebook_1.AddPage(self.notebook_1_pane_1, _("Properties"))
         sizer_4.Add(self.notebook_1, 1, wx.EXPAND, 0)
         self.window_2_pane_2.SetSizer(sizer_4)
-        self.window_2.SplitHorizontally(self.window_2_pane_1, self.window_2_pane_2, 201)
+        self.window_2.SplitHorizontally(self.window_2_pane_1, self.window_2_pane_2, 300)
         sizer_2.Add(self.window_2, 1, wx.EXPAND, 0)
         self.window_1_pane_1.SetSizer(sizer_2)
         sizer_6.Add(self.list_records, 1, wx.EXPAND, 0)
@@ -156,7 +156,7 @@ class MainFrame(wx.Frame):
         self.window_3.SplitHorizontally(self.window_3_pane_1, self.window_3_pane_2, 297)
         sizer_5.Add(self.window_3, 1, wx.EXPAND, 0)
         self.window_1_pane_2.SetSizer(sizer_5)
-        self.window_1.SplitVertically(self.window_1_pane_1, self.window_1_pane_2, 173)
+        self.window_1.SplitVertically(self.window_1_pane_1, self.window_1_pane_2, 289)
         sizer_1.Add(self.window_1, 1, wx.EXPAND, 0)
         self.SetSizer(sizer_1)
         self.Layout()
