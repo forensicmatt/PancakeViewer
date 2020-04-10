@@ -43,7 +43,7 @@ class MainFrame(wx.Frame):
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
         self.SetSize((1126, 685))
-        
+
         # Menu Bar
         self.MainFrame_menubar = wx.MenuBar()
         self.File = wx.Menu()
@@ -111,7 +111,7 @@ class MainFrame(wx.Frame):
         # begin wxGlade: MainFrame.__set_properties
         self.SetTitle(_("Pancake Viewer"))
         self.MainFrame_statusbar.SetStatusWidths([-1])
-        
+
         # statusbar fields
         MainFrame_statusbar_fields = [_("MainFrame_statusbar")]
         for i in range(len(MainFrame_statusbar_fields)):
@@ -225,27 +225,15 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def list_records_item_right_click(self, event):  # wxGlade: MainFrame.<event_handler>
-        print("Event handler 'list_records_item_right_click' not implemented!")
-
-        column = event.GetDataViewColumn()
-
-        if column:
             # Get all selected items #
-            if self.list_records.HasSelection():
-                selected_cnt = self.list_records.GetSelectedItemsCount()
-                selected_items = self.list_records.GetSelections()
+        if self.list_records.HasSelection():
+            selected_cnt = self.list_records.GetSelectedItemsCount()
+            selected_items = self.list_records.GetSelections()
 
-                # Get right click item #
-                right_click_item = event.GetItem()
+            # Get right click item #
+            right_click_item = event.GetItem()
 
-                # TODO
-                # When you right click outside of the record area, there is a crash
-                # in old wx, we could get the id and it was set to 0 if it was outside the listed
-                # records. But now comparing id with > causes error in new wx... this needs looking
-                # into.
-                # If id is > 0, record is selected
-                # if right_click_item.ID > 0:
-                #     self.PopupMenu(self.record_pane_menu)
+            if int(right_click_item.ID) > 0:
                 self.PopupMenu(self.record_pane_menu)
 
         event.Skip()
