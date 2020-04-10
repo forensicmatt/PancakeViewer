@@ -19,11 +19,11 @@ class EvidenceManager():
     def __init__(self,mainFrame):
         self.mainFrame = mainFrame
 
-    def EnumerateEvidenceSource(self,filename):
+    def EnumerateEvidenceSource(self, filename):
         evidenceContainer = EvidenceContainer()
         evidenceContainer.OpenSourcePath(filename)
 
-        match = re.match(r"^\\\\\.\\([a-zA-Z])\:$",filename)
+        match = re.match(r"^\\\\\.\\([a-zA-Z])\:$", filename)
 
         if match:
             os_path_spec = path_spec_factory.Factory.NewPathSpec(
@@ -117,6 +117,11 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
             tree_fs.SetItemImage(tree_item, icon[0], icon[1])
 
     def _GetAlias(self,scan_node):
+        """Generate a string alias for a given node to represent it by in the tree view.
+
+        :param scan_node: <SourceScanNode> The scan node to create an alias for.
+        :return: <str> The name to represent this item on the tree naviagter
+        """
         alias = scan_node.type_indicator
 
         if scan_node.type_indicator == definitions.TYPE_INDICATOR_OS:

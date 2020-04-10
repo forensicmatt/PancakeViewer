@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import wx
+import logging
 from dfvfs.helpers import source_scanner
 from dfvfs.lib import definitions
 from dfvfs.resolver import resolver
@@ -32,7 +33,7 @@ def EnumerateNode(mainFrame,tree_item,node,dlg_flag=True):
                     file_system = resolver.Resolver.OpenFileSystem(path_spec)
                 except Exception as error:
                     file_system = None
-                    print(str(error))
+                    logging.exception(error)
 
                 if file_system is not None:
                     if dlg_flag:

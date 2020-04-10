@@ -390,40 +390,57 @@ class MainFrame(wx.Frame):
         # Set Properties
         self._SetProperties(node)
 
-    def FsTreeItemSelected(self,event):
+    def FsTreeItemSelected(self, event):
+        """This is called when an item in the navigation tree (TreeCtrl) has been activated (double click).
+
+        :param event: <TreeEvent>
+        :return: None
+        """
         print('FsTreeItemSelected')
         item = event.GetItem()
-        node = self.tree_fs.GetItemData(item)
+        tree_item_data = self.tree_fs.GetItemData(item)
 
         # Set Properties
-        self._SetProperties(node)
+        self._SetProperties(tree_item_data)
 
         # Enumerate Folders
-        self._EnumFolders(item,node)
+        self._EnumFolders(item, tree_item_data)
 
         # Populate Records Pane
-        self._PopulateRecords(item,node)
+        self._PopulateRecords(item, tree_item_data)
 
         print(item)
 
-    def _SetProperties(self,node):
+    def _SetProperties(self, node):
+        """Set the properties in the property pane for a given node.
+
+        :param node:
+        :return:
+        """
         Properties.EnumerateProperties(
             self.property_grid_1,
             node
         )
 
-    def _EnumFolders(self,tree_item,node):
+    def _EnumFolders(self, tree_item, node):
         FileSystemEnumerator.EnumerateNode(
             self,
             tree_item,
             node
         )
 
-    def _PopulateRecords(self,tree_item,file_entry):
+    def _PopulateRecords(self, tree_item, tree_item_data):
+        """Populate the file entries in the file entry pane (RecordDVListCtrl).
+
+        :param tree_item: <TreeItemId> This is the id of the tree item.
+        :param tree_item_data: <object> This is what ever object was set for the tree item.
+        :return: <None>
+        """
         self.list_records.DeleteAllItems()
         self.list_records.ClearData()
-        self.list_records.SetCurrentParrent(file_entry)
-        if isinstance(file_entry,tsk_file_entry.TSKFileEntry):
+        self.list_records.SetCurrentParrent(tree_item_data)
+        if isinstance(tree_item_data, tsk_file_entry.TSKFileEntry):
+            file_entry = tree_item_data
             # After a while the file system will close... not sure if this is something I am doing.
             # We need to check if the file system is closed, and open it before we try enumerating the entries
             if not file_entry._file_system._is_open:
@@ -431,7 +448,10 @@ class MainFrame(wx.Frame):
                 file_entry._file_system.Open(file_entry.path_spec)
 
             for sub_file_entry in file_entry.sub_file_entries:
-                self.list_records.InsertRecord(sub_file_entry,file_entry.full_path)
+                self.list_records.InsertRecord(
+                    sub_file_entry,
+                    file_entry.full_path
+                )
 
     def OpenLogical(self, event):  # wxGlade: MainFrame.<event_handler>
         print("Event handler 'OpenLogical' not implemented!")
