@@ -260,7 +260,7 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def LoadIconList(self):
-        isz = (16, 16)
+        isz = (36, 36)
         self.tree_fs.icon_list = wx.ImageList(*isz)
 
         folder = wx.Icon(
@@ -372,11 +372,12 @@ class MainFrame(wx.Frame):
         value = event.GetValue()
         pos = event.GetPosition()
 
-        pnt = self.list_records.GetItemData(item) - 1 # On a zero index
-        node = self.list_records.data[pnt]
+        if item:
+            pnt = self.list_records.GetItemData(item) - 1 # On a zero index
+            node = self.list_records.data[pnt]
 
-        # Set Properties
-        self._SetProperties(node)
+            # Set Properties
+            self._SetProperties(node)
 
     def FsTreeItemSelected(self, event):
         """This is called when an item in the navigation tree (TreeCtrl) has been activated (double click).
