@@ -103,10 +103,11 @@ class MainFrame(wx.Frame):
         self.MainFrame_statusbar.SetStatusWidths([-1])
 
         # statusbar fields
-        #TODO Replace this with enumerate
         MainFrame_statusbar_fields = [_("MainFrame_statusbar")]
-        for i in range(len(MainFrame_statusbar_fields)):
-            self.MainFrame_statusbar.SetStatusText(MainFrame_statusbar_fields[i], i)
+
+        for i in enumerate(MainFrame_statusbar_fields):
+            self.MainFrame_statusbar.SetStatusText(i[1], i[0])
+
         self.window_2.SetMinimumPaneSize(20)
         self.window_3.SetMinimumPaneSize(20)
         self.window_1.SetMinimumPaneSize(80)
