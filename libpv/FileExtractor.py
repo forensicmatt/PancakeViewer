@@ -82,13 +82,12 @@ class FileExtractor(multiprocessing.Process):
 
     def _GetExportFilename(self, outpath_stack, filename, ads_name=None):
         """Create a export filename"""
-        export_filename = u''
-        path_sep = os.pathsep
         export_path = os.path.sep.join(outpath_stack)
 
         name = os.path.basename(filename)
         if ads_name:
-            name = u'{}.{}'.format(name,ads_name)
+            name = u'{}.{}'.format(name, ads_name)
+
         export_filename = os.path.join(export_path, name)
 
         return export_filename
@@ -103,8 +102,6 @@ class FileExtractor(multiprocessing.Process):
                     # Only extract out this ads because it was specified #
                     if specified_ads_name != ads.name:
                         continue
-
-                    full_path = u'{}:{}'.format(full_path,ads.name)
 
                 if len(ads.name) > 0:
                     ads_name = ads.name
@@ -164,15 +161,17 @@ class FileExtractor(multiprocessing.Process):
         if ads_name:
             data_stream_name = ads_name
             for attribute in tsk_file:
-                if attribute.info.name == data_stream_name:
-                    use_attribute = attribute
-                    if data_stream_name == u'$J' and int(attribute.info.flags) & pytsk3.TSK_FS_ATTR_SPARSE:
-                        # If USN Journal, start at end of sparse data run #
-                        for run in attribute:
-                            if run.flags != pytsk3.TSK_FS_ATTR_RUN_FLAG_SPARSE:
-                                _offset = run.offset * tsk_file.info.fs_info.block_size
-                                break
-                    break
+                if attribute.info.name is not None:
+                    attribute_name = attribute.info.name.decode("utf8")
+                    if attribute_name == data_stream_name:
+                        use_attribute = attribute
+                        if data_stream_name == '$J' and int(attribute.info.flags) & pytsk3.TSK_FS_ATTR_SPARSE:
+                            # If USN Journal, start at end of sparse data run #
+                            for run in attribute:
+                                if run.flags != pytsk3.TSK_FS_ATTR_RUN_FLAG_SPARSE:
+                                    _offset = run.offset * tsk_file.info.fs_info.block_size
+                                    break
+                        break
 
         if _offset is None:
             _offset = 0
