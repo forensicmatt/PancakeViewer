@@ -2,15 +2,13 @@
 import multiprocessing
 import os
 import errno
-import re
-import wx
 import pytsk3
 from dfvfs.resolver import resolver
 from dfvfs.path import path_spec
 from dfvfs.resolver import context
 
 class FileExtractor(multiprocessing.Process):
-    def __init__(self,fs_path_spec,output_path):
+    def __init__(self, fs_path_spec, output_path):
         super(FileExtractor, self).__init__()
         self._READ_BUFFER_SIZE = 32768
 
@@ -38,7 +36,7 @@ class FileExtractor(multiprocessing.Process):
             if isinstance(file_item, str):
                 if file_item == 'TERMINATE':
                     break
-            elif isinstance(file_item,ExtractionInfo):
+            elif isinstance(file_item, ExtractionInfo):
                 # Get dfvfs file entry from our path_spec #
                 outpath_stack = list(os.path.split(
                     self.output_path
@@ -72,7 +70,7 @@ class FileExtractor(multiprocessing.Process):
             os.getpid()
         ))
 
-    def _GetStreamName(self,full_path):
+    def _GetStreamName(self, full_path):
         ads_name = None
 
         if ':' in full_path:
@@ -176,7 +174,7 @@ class FileExtractor(multiprocessing.Process):
         if _offset is None:
             _offset = 0
 
-        if use_attribute != None:
+        if use_attribute:
             _filesize = use_attribute.info.size
         else:
             _filesize = tsk_file.info.meta.size
@@ -184,7 +182,7 @@ class FileExtractor(multiprocessing.Process):
         while _offset < _filesize:
             available_to_read = min(self._READ_BUFFER_SIZE, _filesize - _offset)
 
-            if use_attribute != None:
+            if use_attribute:
                 data = tsk_file.read_random(
                     _offset,
                     available_to_read,
@@ -207,7 +205,7 @@ class FileExtractor(multiprocessing.Process):
         outfile.close()
         return True
 
-    def AddFileToQueue(self,tsk_file_entry):
+    def AddFileToQueue(self, tsk_file_entry):
         einfo = ExtractionInfo(
             tsk_file_entry.path_spec,
             tsk_file_entry.full_path
@@ -218,6 +216,6 @@ class FileExtractor(multiprocessing.Process):
         self.file_queue.put(u'TERMINATE')
 
 class ExtractionInfo():
-    def __init__(self,path_spec,full_path):
+    def __init__(self, path_spec, full_path):
         self.path_spec = path_spec
         self.full_path = full_path

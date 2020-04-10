@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import wx.propgrid
+
 from dfvfs.helpers import source_scanner
 from dfvfs.lib import definitions
 from dfvfs.volume import volume_system
@@ -9,12 +10,12 @@ from dfvfs.resolver import resolver
 from dfvfs.vfs import ntfs_file_system
 from dfvfs.vfs import tsk_file_entry
 
-def EnumerateProperties(property_grid_1,node):
+def EnumerateProperties(property_grid_1, node):
     # Clear previous properties
     property_grid_1.Clear()
     properties = []
 
-    if isinstance(node,source_scanner.SourceScanNode):
+    if isinstance(node, source_scanner.SourceScanNode):
         if node.type_indicator == definitions.TYPE_INDICATOR_OS:
             properties = OsProperties(node)
         elif node.type_indicator == definitions.TYPE_INDICATOR_EWF:
@@ -27,23 +28,21 @@ def EnumerateProperties(property_grid_1,node):
             properties = VshadowProperties(node)
         else:
             raise Exception(u'Unhandled type enumeration. type: {}'.format(node.type_indicator))
-    elif isinstance(node,tsk_file_entry.TSKFileEntry):
+    elif isinstance(node, tsk_file_entry.TSKFileEntry):
             properties = TskFileEntryProperties(node)
-            pass
     else:
         raise Exception(u'Unhandled Class in Property Enumeration. type: {}'.format(str(type(node))))
 
-    for property in properties:
-        property_grid_1.Append(property)
+    for prop in properties:
+        property_grid_1.Append(prop)
 
 class OsProperties(list):
-    def __init__(self,node):
+    def __init__(self, node):
         self.append(wx.propgrid.PropertyCategory("OS Path Spec"))
-        self.append(wx.propgrid.StringProperty("Location", value=getattr(node.path_spec,'location',None)))
-        pass
+        self.append(wx.propgrid.StringProperty("Location", value=getattr(node.path_spec, 'location', None)))
 
 class TskFileEntryProperties(list):
-    def __init__(self,node):
+    def __init__(self, node):
         self.append(wx.propgrid.StringProperty("Full Path",
             value=u'{}'.format(node.full_path.encode('utf-8', u'replace'))))
         self.append(wx.propgrid.PropertyCategory("TSK File Meta Info"))
@@ -54,7 +53,7 @@ class TskFileEntryProperties(list):
         self.append(wx.propgrid.StringProperty(
             "Flags", value=u'{}'.format(meta.flags)))
         self.append(wx.propgrid.UIntProperty(
-            "Address",value=meta.addr))
+            "Address", value=meta.addr))
         self.append(wx.propgrid.IntProperty(
             "Sequence", value=meta.seq))
         self.append(wx.propgrid.UIntProperty(
@@ -69,7 +68,7 @@ class TskFileEntryProperties(list):
             "Size", value=meta.size))
 
 class EwfProperties(list):
-    def __init__(self,node):
+    def __init__(self, node):
         ewf = resolver.Resolver.OpenFileObject(node.path_spec)
 
         self.append(wx.propgrid.PropertyCategory("EWF Information"))
@@ -89,7 +88,7 @@ class EwfProperties(list):
             self.append(wx.propgrid.StringProperty(key, value=u'{}'.format(value)))
 
 class TskPartitionProperties(list):
-    def __init__(self,node):
+    def __init__(self, node):
         file_system = resolver.Resolver.OpenFileSystem(node.path_spec)
 
         for volume in file_system._tsk_volume:
@@ -110,10 +109,9 @@ class TskPartitionProperties(list):
                                                        value=u'{}'.format(getattr(volume, 'table_num', None))))
                 self.append(wx.propgrid.StringProperty("Tag",
                                                        value=u'{}'.format(getattr(volume, 'tag', None))))
-                pass
 
 class TskProperties(list):
-    def __init__(self,node):
+    def __init__(self, node):
         try:
             file_system = resolver.Resolver.OpenFileSystem(node.path_spec)
         except Exception as error:
@@ -129,7 +127,7 @@ class TskProperties(list):
 
             self.append(wx.propgrid.PropertyCategory("TSK File System Info"))
             self.append(wx.propgrid.StringProperty(
-                "Block Count",value=u'{}'.format(getattr(tsk_fs_info, 'block_count', None))))
+                "Block Count", value=u'{}'.format(getattr(tsk_fs_info, 'block_count', None))))
             self.append(wx.propgrid.StringProperty(
                 "Block Post Size", value=u'{}'.format(getattr(tsk_fs_info, 'block_post_size', None))))
             self.append(wx.propgrid.StringProperty(
@@ -168,10 +166,9 @@ class TskProperties(list):
                 "Root Inode", value=u'{}'.format(getattr(tsk_fs_info, 'root_inum', None))))
             self.append(wx.propgrid.StringProperty(
                 "Tag", value=u'{}'.format(getattr(tsk_fs_info, 'tag', None))))
-        pass
 
 class VshadowProperties(list):
-    def __init__(self,node):
+    def __init__(self, node):
         if node.path_spec.store_index is None:
             # VSS Root
             vss = vshadow_volume_system.VShadowVolumeSystem()
