@@ -14,8 +14,9 @@ import wx
 class LogicalVolumeDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: LogicalVolumeDialog.__init__
-        kwds["style"] = kwds.get("style", 0)
+        kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_DIALOG_STYLE
         wx.Dialog.__init__(self, *args, **kwds)
+        self.SetSize((400, 115))
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
         self.panel_4 = wx.Panel(self, wx.ID_ANY)
         self.label_1 = wx.StaticText(self, wx.ID_ANY, _("Select Logical Volume: "))
@@ -42,6 +43,7 @@ class LogicalVolumeDialog(wx.Dialog):
     def __set_properties(self):
         # begin wxGlade: LogicalVolumeDialog.__set_properties
         self.SetTitle(_("Select Logical Volume"))
+        self.SetSize((400, 115))
         self.panel_1.SetMinSize((379, 5))
         self.panel_4.SetMinSize((5, 25))
         self.panel_7.SetMinSize((5, 25))
@@ -75,7 +77,6 @@ class LogicalVolumeDialog(wx.Dialog):
         sizer_12.Add(self.panel_2, 0, wx.EXPAND, 0)
         sizer_11.Add(sizer_12, 1, 0, 0)
         self.SetSizer(sizer_11)
-        sizer_11.Fit(self)
         self.Layout()
         # end wxGlade
 
