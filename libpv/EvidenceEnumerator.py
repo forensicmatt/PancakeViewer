@@ -104,7 +104,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
 
         for data_stream in file_entry.data_streams:
             if data_stream.name:
-                print(u'{}:{}'.format(full_path, data_stream.name).encode('utf-8', u'replace'))
+                print(u'{}:{}'.format(full_path, data_stream.name).encode('utf-8',u'replace'))
 
         for sub_file_entry in file_entry.sub_file_entries:
             self._ProcessFile(file_system, sub_file_entry, full_path)
@@ -180,9 +180,6 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
             else:
                 alias = os.path.basename(alias)
 
-        #Remove python3 b'' byte-encoded str wrapper without breaking unicode support
-        if alias.startswith("b'"):
-            alias = str(alias)[2:-1]
         return alias
 
     def _ProcessNode(self, tree_fs, parent_item, scan_node):
@@ -207,7 +204,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
             )
 
             # Set Icons for this node
-            self._SetNodeIcons(scan_node, tree_fs, tree_item)
+            self._SetNodeIcons(scan_node,tree_fs,tree_item)
         else:
             tree_item = parent_item
 

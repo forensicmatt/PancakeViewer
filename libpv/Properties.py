@@ -44,7 +44,7 @@ class OsProperties(list):
 class TskFileEntryProperties(list):
     def __init__(self, node):
         self.append(wx.propgrid.StringProperty("Full Path",
-            value=u'{}'.format(repr(node.full_path.encode('utf-8', u'replace'))[2:-1])))
+            value=u'{}'.format(node.full_path.encode('utf-8', u'replace'))))
         self.append(wx.propgrid.PropertyCategory("TSK File Meta Info"))
         meta = node._tsk_file.info.meta
 
