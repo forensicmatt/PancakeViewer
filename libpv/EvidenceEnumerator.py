@@ -104,7 +104,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
 
         for data_stream in file_entry.data_streams:
             if data_stream.name:
-                print(u'{}:{}'.format(full_path, data_stream.name).encode('utf-8',u'replace'))
+                print(u'{}:{}'.format(full_path, data_stream.name).encode('utf-8', u'replace'))
 
         for sub_file_entry in file_entry.sub_file_entries:
             self._ProcessFile(file_system, sub_file_entry, full_path)
@@ -139,7 +139,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
                 file_system = resolver.Resolver.OpenFileSystem(scan_node.path_spec)
                 for volume in file_system._tsk_volume:
                     if volume.addr == scan_node.path_spec.part_index:
-                        alias = u'{}'.format(volume.desc)
+                        alias = u'{}'.format(volume.desc.decode('utf-8'))
                         break
             else:
                 return None
@@ -204,7 +204,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
             )
 
             # Set Icons for this node
-            self._SetNodeIcons(scan_node,tree_fs,tree_item)
+            self._SetNodeIcons(scan_node, tree_fs, tree_item)
         else:
             tree_item = parent_item
 
