@@ -21,11 +21,18 @@ from libpv import Properties
 from ExtractionDialog import ExtractionDialog
 from LogicalVolumeDialog import LogicalVolumeDialog
 
+# begin wxGlade: dependencies
+# end wxGlade
+
+# begin wxGlade: extracode
+# end wxGlade
+
 logging.basicConfig(level=logging.DEBUG)
 
 
 class MainFrame(wx.Frame):
     def __init__(self, *args, **kwds):
+        # begin wxGlade: MainFrame.__init__
         kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
         self.SetSize((1126, 685))
@@ -81,6 +88,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_TREE_ITEM_GETTOOLTIP, self.tree_fs_item_gettooltip, self.tree_fs)
         self.Bind(wx.EVT_TREE_SEL_CHANGED, self.tree_fs_sel_changed, self.tree_fs)
         self.Bind(wx.EVT_TREE_SEL_CHANGING, self.tree_fs_sel_changing, self.tree_fs)
+        # end wxGlade
         self._READ_BUFFER_SIZE = 32768
 
         self._InitRecordPaneMenu()
@@ -99,6 +107,7 @@ class MainFrame(wx.Frame):
         self.tree_fs_root = self.tree_fs.AddRoot('root')
 
     def __set_properties(self):
+        # begin wxGlade: MainFrame.__set_properties
         self.SetTitle(_("Pancake Viewer"))
         self.MainFrame_statusbar.SetStatusWidths([-1])
 
@@ -111,8 +120,10 @@ class MainFrame(wx.Frame):
         self.window_2.SetMinimumPaneSize(20)
         self.window_3.SetMinimumPaneSize(20)
         self.window_1.SetMinimumPaneSize(80)
+        # end wxGlade
 
     def __do_layout(self):
+        # begin wxGlade: MainFrame.__do_layout
         sizer_1 = wx.BoxSizer(wx.VERTICAL)
         sizer_5 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_7 = wx.BoxSizer(wx.HORIZONTAL)
@@ -150,6 +161,7 @@ class MainFrame(wx.Frame):
         sizer_1.Add(self.window_1, 1, wx.EXPAND, 0)
         self.SetSizer(sizer_1)
         self.Layout()
+        # end wxGlade
 
     def tree_fs_item_changed(self, event):  # wxGlade: MainFrame.<event_handler>
         print("Event handler 'tree_fs_item_changed'")

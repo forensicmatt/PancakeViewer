@@ -8,6 +8,12 @@ import wx
 if sys.platform == 'win32':
     import win32api
 
+# begin wxGlade: dependencies
+# end wxGlade
+
+# begin wxGlade: extracode
+# end wxGlade
+
 class LogicalVolumeDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: LogicalVolumeDialog.__init__
@@ -38,6 +44,7 @@ class LogicalVolumeDialog(wx.Dialog):
         self.PopulateVolumes()
 
     def __set_properties(self):
+        # begin wxGlade: LogicalVolumeDialog.__set_properties
         self.SetTitle(_("Select Logical Volume"))
         self.SetSize((400, 115))
         self.panel_1.SetMinSize((379, 5))
@@ -48,8 +55,10 @@ class LogicalVolumeDialog(wx.Dialog):
         self.panel_9.SetMinSize((5, 26))
         self.panel_6.SetMinSize((93, 20))
         self.panel_2.SetMinSize((379, 5))
+        # end wxGlade
 
     def __do_layout(self):
+        # begin wxGlade: LogicalVolumeDialog.__do_layout
         sizer_11 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_12 = wx.BoxSizer(wx.VERTICAL)
         sizer_14 = wx.BoxSizer(wx.HORIZONTAL)
@@ -72,6 +81,7 @@ class LogicalVolumeDialog(wx.Dialog):
         sizer_11.Add(sizer_12, 1, 0, 0)
         self.SetSizer(sizer_11)
         self.Layout()
+        # end wxGlade
 
     def button_select_click(self, event):  # wxGlade: LogicalVolumeDialog.<event_handler>
         print("Event handler 'button_select_click' not implemented!")

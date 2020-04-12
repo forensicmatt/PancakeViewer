@@ -4,6 +4,11 @@
 #
 
 import wx
+# begin wxGlade: dependencies
+# end wxGlade
+
+# begin wxGlade: extracode
+# end wxGlade
 
 class ExtractionDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
