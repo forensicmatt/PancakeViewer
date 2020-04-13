@@ -10,7 +10,6 @@ import wx
 # begin wxGlade: extracode
 # end wxGlade
 
-
 class ExtractionDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: ExtractionDialog.__init__
@@ -61,7 +60,7 @@ class ExtractionDialog(wx.Dialog):
         self.panel_23.SetMinSize((5, 20))
         self.panel_24.SetMinSize((10, 20))
         self.panel_25.SetMinSize((5, 26))
-        self.panel_10.SetMinSize((379,5))
+        self.panel_10.SetMinSize((379, 5))
         self.panel_13.SetMinSize((5, 47))
         self.radio_box_selection.SetSelection(0)
         self.panel_14.SetMinSize((5, 47))
@@ -129,13 +128,13 @@ class ExtractionDialog(wx.Dialog):
 
     def button_cancel_click(self, event):  # wxGlade: ExtractionDialog.<event_handler>
         print("Event handler 'button_cancel_click' not implemented!")
-        self.EndModal(wx.ID_CANCEL )
+        self.EndModal(wx.ID_CANCEL)
 
     def _InitCheckboxes(self):
         option_strings = [
             'Append inode'
         ]
-        self.checklistbox_options.InsertItems(option_strings,0)
+        self.checklistbox_options.InsertItems(option_strings, 0)
         self.Bind(wx.EVT_LISTBOX, self.EvtListBox, self.checklistbox_options)
         self.Bind(wx.EVT_CHECKLISTBOX, self.EvtCheckListBox, self.checklistbox_options)
 

@@ -14,7 +14,6 @@ if sys.platform == 'win32':
 # begin wxGlade: extracode
 # end wxGlade
 
-
 class LogicalVolumeDialog(wx.Dialog):
     def __init__(self, *args, **kwds):
         # begin wxGlade: LogicalVolumeDialog.__init__

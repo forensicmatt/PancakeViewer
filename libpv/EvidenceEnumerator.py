@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
-import wx
+
+import logging
 import os
 import re
-import logging
+import wx
+
+from dfvfs.analyzer import analyzer
 from dfvfs.credentials import manager as credentials_manager
 from dfvfs.path import factory as path_spec_factory
 from dfvfs.helpers import source_scanner
-from dfvfs.analyzer import analyzer
-from dfvfs.resolver import resolver
 from dfvfs.lib import definitions
 from dfvfs.path import factory
+from dfvfs.resolver import resolver
 from dfvfs.vfs import ntfs_file_system
 from dfvfs.volume import volume_system
+
 from libpv import Properties
 
 
 class EvidenceManager():
-    def __init__(self,mainFrame):
+    def __init__(self, mainFrame):
         self.mainFrame = mainFrame
 
     def EnumerateEvidenceSource(self, filename):
@@ -64,7 +67,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
     def __init__(self):
         source_scanner.SourceScannerContext.__init__(self)
 
-    def _EnumerateTree(self,tree_fs,tree_item):
+    def _EnumerateTree(self, tree_fs, tree_item):
         _root_node = self.GetRootScanNode()
         self._ProcessNode(
             tree_fs,
@@ -78,7 +81,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
 
         self._ProcessNode(_root_node)
 
-    def _ProcessFs(self,file_system_path_spec):
+    def _ProcessFs(self, file_system_path_spec):
         try:
             file_system = resolver.Resolver.OpenFileSystem(file_system_path_spec)
         except Exception as error:
@@ -92,23 +95,21 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
                         file_system_path_spec.comparable)
                 )
                 return
-            self._ProcessFile(file_entry,file_entry,u'')
+            self._ProcessFile(file_entry, file_entry, u'')
 
-        pass
-
-    def _ProcessFile(self,file_system, file_entry, parent_full_path):
+    def _ProcessFile(self, file_system, file_entry, parent_full_path):
         full_path = parent_full_path + u'/' + file_entry.name
 
-        print(full_path.encode('utf-8',u'replace'))
+        print(full_path.encode('utf-8', u'replace'))
 
         for data_stream in file_entry.data_streams:
             if data_stream.name:
-                print(u'{}:{}'.format(full_path, data_stream.name).encode('utf-8',u'replace'))
+                print(u'{}:{}'.format(full_path, data_stream.name).encode('utf-8', u'replace'))
 
         for sub_file_entry in file_entry.sub_file_entries:
             self._ProcessFile(file_system, sub_file_entry, full_path)
 
-    def _SetNodeIcons(self,scan_node,tree_fs,tree_item):
+    def _SetNodeIcons(self, scan_node, tree_fs, tree_item):
         icon_list = self._GetIcons(
             tree_fs,
             scan_node
@@ -116,7 +117,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
         for icon in icon_list:
             tree_fs.SetItemImage(tree_item, icon[0], icon[1])
 
-    def _GetAlias(self,scan_node):
+    def _GetAlias(self, scan_node):
         """Generate a string alias for a given node to represent it by in the tree view.
 
         :param scan_node: <SourceScanNode> The scan node to create an alias for.
@@ -127,7 +128,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
         if scan_node.type_indicator == definitions.TYPE_INDICATOR_OS:
             alias = getattr(scan_node.path_spec, 'location', None)
 
-            match = re.match(r"^\\\\\.\\([a-zA-Z])\:$",alias)
+            match = re.match(r"^\\\\\.\\([a-zA-Z])\:$", alias)
             if match:
                 alias = alias[4:6]
             else:
@@ -138,7 +139,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
                 file_system = resolver.Resolver.OpenFileSystem(scan_node.path_spec)
                 for volume in file_system._tsk_volume:
                     if volume.addr == scan_node.path_spec.part_index:
-                        alias = u'{}'.format(volume.desc)
+                        alias = u'{}'.format(volume.desc.decode('utf-8'))
                         break
             else:
                 return None
@@ -181,7 +182,7 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
 
         return alias
 
-    def _ProcessNode(self,tree_fs,parent_item,scan_node):
+    def _ProcessNode(self, tree_fs, parent_item, scan_node):
         print('{}'.format(scan_node.type_indicator))
 
         # Get alias
@@ -203,14 +204,14 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
             )
 
             # Set Icons for this node
-            self._SetNodeIcons(scan_node,tree_fs,tree_item)
+            self._SetNodeIcons(scan_node, tree_fs, tree_item)
         else:
             tree_item = parent_item
 
-        if (scan_node.type_indicator == definitions.TYPE_INDICATOR_TSK):
+        if scan_node.type_indicator == definitions.TYPE_INDICATOR_TSK:
             print('FILESYSTEM')
             #self._ProcessFs(scan_node.path_spec)
-        elif (scan_node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW):
+        elif scan_node.type_indicator == definitions.TYPE_INDICATOR_VSHADOW:
             print('FILESYSTEM [VSS]')
             path_spec = factory.Factory.NewPathSpec(
                 definitions.TYPE_INDICATOR_TSK,
@@ -220,9 +221,9 @@ class EvidenceContainer(source_scanner.SourceScannerContext):
             #self._ProcessFs(path_spec)
 
         for sub_scan_node in scan_node.sub_nodes:
-            self._ProcessNode(tree_fs,tree_item,sub_scan_node)
+            self._ProcessNode(tree_fs, tree_item, sub_scan_node)
 
-    def _GetIcons(self,tree_fs,sub_scan_node):
+    def _GetIcons(self, tree_fs, sub_scan_node):
         icon_list = []
         if sub_scan_node.type_indicator == definitions.TYPE_INDICATOR_TSK:
             icon_list.append([tree_fs.icon_fldridx, wx.TreeItemIcon_Normal])
